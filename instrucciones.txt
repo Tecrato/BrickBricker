@@ -1,0 +1,42 @@
+Los keybinds (teclas de acceso rapido) son:
+
+
+---------------El juego:
+
+R) Para reiniciar.
+
+Spacio) Para iniciar el nivel.
+
+Escape) sale el menu donde se esta o del programa.
+
+F2) Cambia la cancion.
+
+F11) Para la pantalla completa.
+	(aunque usa un reescalado para cambiar el tamaño,no recomiendo cambiar el tamaño de la 
+	ventana... almenos mientras aprendo como hacer el programa mas flexible).
+
+
+
+---------------En el creador de niveles:
+
+S) para pasar a la pantalla de guardado.
+
+Spacio) Para empezar la captura de color.
+
+Enter) en el menu de confirmacion para confirmar el paso que esta realizando
+
+Click derecho) Para capturar el color.
+
+La rueda del raton cuando el raton esta encima del boton de borrar) para aumentar o 
+	disminuir el rango del borrador.
+
+
+
+Anotaciones:
+
+• En el creador de niveles, todos los bloques se parezcan demasiado al color negro,
+no se tomaran en cuenta a la hora de guardarlo.
+
+• Para eliminar niveles guardados se debera entrar en el juego principal.
+
+• Cualquier bug o recomendacion son bienvenida, se aplicaran en actualizaciones futuras.
