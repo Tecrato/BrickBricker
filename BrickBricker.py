@@ -165,7 +165,7 @@ class BrickBricker(Botons_functions):
         self.title_easy = Create_boton('Fácil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1), self.ventana, 0, color='white',color_active='red', with_rect=False,func=lambda:self.func_change_difficult(1))
         self.title_medium = Create_boton('Medio', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.13), self.ventana, 0, color='white',color_active='red', with_rect=False ,func=lambda:self.func_change_difficult(2))
         self.title_hard = Create_boton('Difícil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.26), self.ventana, 0, color='white',color_active='red', with_rect=False,func=lambda:self.func_change_difficult(3))
-        self.button_load_music = Create_boton('Cargar musica', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.35), self.ventana,func=lambda:self.func_drop_music_file())
+        self.button_load_music = Create_boton('Cargar musica', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.38), self.ventana, 0,func=lambda:self.func_drop_music_file())
 
 
         self.text_low_detail_mode = Create_boton('Low Detail Mode: X', 20, self.fuente_orbi_medium, (0,self.ventana_rect.h), self.ventana, 40, 'bottomleft', 'white', with_rect=False, func= self.func_low_detail_mode)
