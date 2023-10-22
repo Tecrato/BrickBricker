@@ -1130,6 +1130,7 @@ class BrickBricker(Botons_functions):
                             self.sounds.decepcion.play()
                     self.acercandose = False
                     self.deltatime_ball.FPS = self.framerate_dificultad
+
             elif not self.ball.lenta and not self.ball.rapida:
                 self.deltatime_ball.FPS = self.framerate_dificultad
                 
@@ -1142,6 +1143,7 @@ class BrickBricker(Botons_functions):
                         tra['transition'].move([(self.player.rect2.centerx, 650), (self.player.rect2.centerx, 650 + 15), (self.player.rect2.centerx, 650)])
                         self.player.rect2.center = vec
                     elif tra['afectado'] == 'ball':
+                        print(self.deltatime_ball.dt)
                         self.deltatime_ball.FPS = vec[1]
                     else:
                         self.bloques[tra['afectado']]['rect'].center = vec
@@ -1155,7 +1157,8 @@ class BrickBricker(Botons_functions):
                 self.playing = False
 
 
-                        # Dibujar
+                        # -----------------------------------Dibujar --------------------------------------
+
             self.draw_effects_before()
 
             if not self.low_detail_mode:
