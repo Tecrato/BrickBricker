@@ -151,11 +151,11 @@ class BrickBricker(Botons_functions):
         pag.display.flip()
                                                 #De la pantalla de titulo
         self.title_text = Create_text('BrickBricker', 50, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.boton_reanudar = Create_boton('Reanudar', 35, self.fuente_orbi_medium, (-500,-500), self.ventana, color='white', with_rect=False, func=self.func_reanudar)
-        self.boton_jugar = Create_boton('Jugar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.0), self.ventana, color='white', with_rect=False,func=self.func_jugar)
-        self.boton_fan_lvls = Create_boton('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery), self.ventana, color='white', with_rect=False,func=self.func_fan_lvls_title)
-        self.options_text_title = Create_boton('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15), self.ventana, color='white', with_rect=False,func=self.func_opciones)
-        self.salir_text_title = Create_boton('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3), self.ventana,color='white',color_active='darkgrey', with_rect=False)
+        self.boton_reanudar = Create_boton('Reanudar', 35, self.fuente_orbi_medium, (-500,-500), self.ventana, 0, color='white', with_rect=False, func=self.func_reanudar)
+        self.boton_jugar = Create_boton('Jugar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.0), self.ventana, 0, color='white', with_rect=False,func=self.func_jugar)
+        self.boton_fan_lvls = Create_boton('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery), self.ventana, 0, color='white', with_rect=False,func=self.func_fan_lvls_title)
+        self.options_text_title = Create_boton('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15), self.ventana, 0, color='white', with_rect=False,func=self.func_opciones)
+        self.salir_text_title = Create_boton('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3), self.ventana, 0,color='white',color_active='darkgrey', with_rect=False)
         self.salir_text_title.smothmove(1/60, 1, 0.73, 2)
         self.boton_extras = Create_boton('', 40, self.fuente_simbolos, (0,self.ventana_rect.h-20), self.ventana, dire='left', color='white', with_rect=False,func=self.func_extras)
         
