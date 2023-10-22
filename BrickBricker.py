@@ -726,7 +726,7 @@ class BrickBricker(Botons_functions):
             self.sounds.slow.play()
         elif type == 5 and not self.ball.lenta:
             self.ball.rapida = True
-            self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(30, [(0,self.framerate_dificultad), (0,self.framerate_dificultad*2)]), 'afectado': 'ball'})
+            self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(30, [(0,self.framerate_dificultad), (0,self.framerate_dificultad*1.5)]), 'afectado': 'ball'})
             pag.time.set_timer(USEREVENT+2,5000,1)
             self.sounds.fast.play()
         elif type == 6:
@@ -980,7 +980,7 @@ class BrickBricker(Botons_functions):
                     self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad/2), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
                 if eventos.type == USEREVENT+2:
                     self.ball.rapida = False
-                    self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad*2), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
+                    self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad*1.5), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
                 if eventos.type == KEYDOWN:
                     if eventos.key == K_ESCAPE or eventos.key == K_SPACE:
                         self.sounds.boton1.play()
@@ -1058,7 +1058,7 @@ class BrickBricker(Botons_functions):
                     self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad/2), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
                 if eventos.type == USEREVENT+2:
                     self.ball.rapida = False
-                    self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad*2), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
+                    self.cubic_bezier_transitions.append({'transition': Curva_de_Bezier(60, [(0,self.framerate_dificultad*1.5), (0,self.framerate_dificultad)]), 'afectado': 'ball'})
                 elif eventos.type == KEYDOWN:
                     if eventos.key == K_u and self.alive and not self.fan_lvl_bool:
                         self.lvl += 1
@@ -1143,7 +1143,6 @@ class BrickBricker(Botons_functions):
                         tra['transition'].move([(self.player.rect2.centerx, 650), (self.player.rect2.centerx, 650 + 15), (self.player.rect2.centerx, 650)])
                         self.player.rect2.center = vec
                     elif tra['afectado'] == 'ball':
-                        print(self.deltatime_ball.dt)
                         self.deltatime_ball.FPS = vec[1]
                     else:
                         self.bloques[tra['afectado']]['rect'].center = vec
