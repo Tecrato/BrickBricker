@@ -9,6 +9,8 @@ class Set_sounds:
         self.ball_pop = pag.mixer.Sound('./Assets/sounds/ballclick2.ogg')
         self.ball_pop2 = pag.mixer.Sound('./Assets/sounds/ballclick1.ogg')
 
+        self.decepcion = pag.mixer.Sound('./Assets/sounds/reaccion decepcion.mp3')
+
         self.ball_colicion= pag.mixer.Sound('./Assets/sounds/choque.mp3')
 
         self.lvl_clear = pag.mixer.Sound('./Assets/sounds/lvl clear.mp3')
@@ -18,8 +20,6 @@ class Set_sounds:
         self.loss = pag.mixer.Sound('./Assets/sounds/loss.mp3')
 
         self.casi = pag.mixer.Sound('./Assets/sounds/casi.mp3')
-
-        self.decepcion = pag.mixer.Sound('./Assets/sounds/reaccion decepcion.mp3')
 
         self.extra_life = pag.mixer.Sound('./Assets/sounds/extra life.mp3')
 

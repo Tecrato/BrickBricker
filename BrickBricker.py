@@ -475,7 +475,7 @@ class BrickBricker(Botons_functions):
         if len(self.effects_before) < 1:
             return
         for i,x in sorted(enumerate(self.effects_before), reverse=True):
-            if x.update():
+            if x.update(dt=self.deltatime.dt):
                 self.effects_before.pop(i)
         for x in self.effects_before:
             x.draw()
@@ -483,7 +483,7 @@ class BrickBricker(Botons_functions):
         if len(self.effects_after) < 1:
             return
         for i,x in sorted(enumerate(self.effects_after), reverse=True):
-            if x.update():
+            if x.update(dt=self.deltatime.dt):
                 self.effects_after.pop(i)
         for x in self.effects_after:
             x.draw()
@@ -767,18 +767,23 @@ class BrickBricker(Botons_functions):
 
             #Para el input
             for en in self.all_inputs:
-                if resultado := en.eventos_teclado(eventos) == "enter" and entradas[0].get_text() != "":
-                    ecuaciones.append((formatear_texto(entradas[0].get_text()),entradas[1].get_text() if entradas[1].get_text() != '' else True))
-                    print(ecuaciones)
+                if resultado := en.eventos_teclado(eventos) == "enter" and self.all_inputs[0].get_text() != "si":
+                    self.bool_title_confirm = False
+                    return True
+                else: 
+                    self.bool_title_confirm = False
+                    return False
+                    # ecuaciones.append((formatear_texto(entradas[0].get_text()),entradas[1].get_text() if entradas[1].get_text() != '' else True))
+                    # print(ecuaciones)
             #Fin del input
             for eventos in eventos:
                 if eventos.type == pag.KEYDOWN:
                     if eventos.key == K_ESCAPE:
                         self.bool_title_confirm = False
-                    elif eventos.key == K_RETURN:
-                        self.bool_title_confirm = False
-                        if self.input_confirm.get_text().lower() == 'si':return True
-                        else: return False
+                    # elif eventos.key == K_RETURN:
+                    #     self.bool_title_confirm = False
+                    #     if self.input_confirm.get_text().lower() == 'si':return True
+                    #     else: return False
                 if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
                     if self.pausa_text_X.rect.collidepoint(eventos.pos):
                         self.bool_title_confirm = False
@@ -1114,10 +1119,12 @@ class BrickBricker(Botons_functions):
                 angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)
                 angulo2 = Angulo((0,0),self.ball.vel)
                 dist = Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center)
+                print(180*(130/dist))
                 # if (Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 150 and angulo1 > angulo2-15 and angulo1 < angulo2+15) or(
                 #     Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 110 and angulo1 > angulo2-20 and angulo1 < angulo2+20) or (
                 #     Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 50 and angulo1 > angulo2-170 and angulo1 < angulo2+170):
-                if angulo1 > (angulo2- (angulo2* abs((1.5-(dist/150))*.8)))*.7 and angulo1 < (angulo2+ (angulo2* abs(1.5-(dist/150))*.8))*.7 or dist < 50:
+                # if angulo1 > (angulo2- (angulo2* abs((1.5-(dist/150))*.8)))*.7 and angulo1 < (angulo2+ (angulo2* abs(1.5-(dist/150))*.8))*.7 or dist < 50:
+                if abs(angulo1 - angulo2)/180 < 180*(130/dist):
                     if not self.acercandose:
                         self.acercandose = True
                         self.sounds.casi.play()

@@ -50,7 +50,7 @@ class Effect:
     def update(self, left = None, dt=1) -> bool:
         if self.type == 1:
             self.color_grade -= .03
-            self.rect.top -= .05
+            self.rect.top -= 1
             self.rect.left = left if left != None else self.rect.left
             if self.color_grade <= .05:
                 return True

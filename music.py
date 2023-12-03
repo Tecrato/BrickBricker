@@ -12,7 +12,7 @@ class Set_music:
         self.aleatorio = aleatorio
         pag.mixer_music.set_endevent(50000)
 
-    def load_music(self, dir = None, mode = 1) -> str:
+    def load_music(self, dir = None) -> str:
         # BASE_DIR = '/'.join(__file__.split('\\')[:-1])
         BASE_DIR = Path(__file__).resolve().parent
         self.canciones.clear()
