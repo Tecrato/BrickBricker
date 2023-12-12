@@ -33,7 +33,6 @@ class Set_music:
             try:
                 self.music_var = pag.mixer_music.load(dir)
                 self.canciones.append(dir)
-                print('s')
                 return self.change()
             except:
                 messagebox(

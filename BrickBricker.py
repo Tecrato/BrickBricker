@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pygame._sdl2 import messagebox
 from pygame.locals import *
 from io import open
-from platformdirs import *
+from platformdirs import user_data_dir
 from Utilidades import *
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
@@ -773,8 +773,6 @@ class BrickBricker(Botons_functions):
                 else: 
                     self.bool_title_confirm = False
                     return False
-                    # ecuaciones.append((formatear_texto(entradas[0].get_text()),entradas[1].get_text() if entradas[1].get_text() != '' else True))
-                    # print(ecuaciones)
             #Fin del input
             for eventos in eventos:
                 if eventos.type == pag.KEYDOWN:
@@ -1116,15 +1114,15 @@ class BrickBricker(Botons_functions):
             self.loss()
 
             if len(self.bloques) == 6 and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 130:
-                angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)
-                angulo2 = Angulo((0,0),self.ball.vel)
+                angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)/360
+                angulo2 = Angulo((0,0),self.ball.vel)/360
                 dist = Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center)
                 print(180*(130/dist))
                 # if (Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 150 and angulo1 > angulo2-15 and angulo1 < angulo2+15) or(
                 #     Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 110 and angulo1 > angulo2-20 and angulo1 < angulo2+20) or (
                 #     Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 50 and angulo1 > angulo2-170 and angulo1 < angulo2+170):
                 # if angulo1 > (angulo2- (angulo2* abs((1.5-(dist/150))*.8)))*.7 and angulo1 < (angulo2+ (angulo2* abs(1.5-(dist/150))*.8))*.7 or dist < 50:
-                if abs(angulo1 - angulo2)/180 < 180*(130/dist):
+                if 0<numpy.abs(angulo1-angulo2)<.3:
                     if not self.acercandose:
                         self.acercandose = True
                         self.sounds.casi.play()
