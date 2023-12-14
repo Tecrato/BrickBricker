@@ -1,8 +1,7 @@
-import pygame as pag, time, random, numpy
-from pygame.surface import Surface
-from pygame.locals import *
+import pygame as pag, time
+from numpy import random,cos,sin,radians,pi
 class Background:
-	def __init__(self,surface:Surface,size, type = 1) -> None:
+	def __init__(self,surface,size, type = 1) -> None:
 		self.surface = surface
 		self.surface2 = pag.surface.Surface(size)
 		self.size = size
@@ -59,20 +58,20 @@ class Background:
 				radio = random.randint(10,50)
 				left = random.randint(0,self.size[0])
 				angle = random.randint(0,360)
-				reduce = random.random()*0.7 +0.1
-				self.squares.append({'top':-radio,'left':left,'angle':angle, 'radio':radio,'reduce':reduce})
+				giro = random.random()*0.7 +0.1
+				self.squares.append({'top':-radio,'left':left,'angle':angle, 'radio':radio,'giro':giro})
 				self.timer = random.random()*2.5 + 0.5
 				self.last_time = time.time()
 			for i,poly in sorted(enumerate(self.squares),reverse=True):
 				poly['top']+=1
-				poly['angle']+=poly['reduce']
+				poly['angle']+=poly['giro']
 				if poly['top'] > self.size[1]+poly['radio']:
 					self.squares.pop(i)
 				polygon = [
-					[poly['left'] + numpy.cos(numpy.radians(poly['angle'])) * poly['radio'],poly['top'] - numpy.sin(numpy.radians(poly['angle'])) * poly['radio']],
-					[poly['left'] + numpy.cos(numpy.radians(poly['angle'])+numpy.pi/2) * poly['radio'],poly['top'] - numpy.sin(numpy.radians(poly['angle'])+numpy.pi/2) * poly['radio']],
-					[poly['left'] + numpy.cos(numpy.radians(poly['angle'])+numpy.pi) * poly['radio'],poly['top'] - numpy.sin(numpy.radians(poly['angle'])+numpy.pi) * poly['radio']],
-					[poly['left'] + numpy.cos(numpy.radians(poly['angle'])-numpy.pi/2) * poly['radio'],poly['top'] - numpy.sin(numpy.radians(poly['angle'])-numpy.pi/2) * poly['radio']],
+					[poly['left'] + cos(radians(poly['angle'])) * poly['radio'],poly['top'] - sin(radians(poly['angle'])) * poly['radio']],
+					[poly['left'] + cos(radians(poly['angle'])+pi/2) * poly['radio'],poly['top'] - sin(radians(poly['angle'])+pi/2) * poly['radio']],
+					[poly['left'] + cos(radians(poly['angle'])+pi) * poly['radio'],poly['top'] - sin(radians(poly['angle'])+pi) * poly['radio']],
+					[poly['left'] + cos(radians(poly['angle'])-pi/2) * poly['radio'],poly['top'] - sin(radians(poly['angle'])-pi/2) * poly['radio']],
 				]
 				pag.draw.polygon(self.surface2,'darkgrey', polygon,5)
 			self.surface.blit(self.surface2,(0,0))

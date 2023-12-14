@@ -1,5 +1,5 @@
-import pygame as pag, numpy, random
-from pygame.surface import Surface
+import pygame as pag
+from numpy import random,sin,cos,radians
 
 
 from Utilidades.particles import Particles
@@ -8,7 +8,15 @@ from Utilidades.particles import Particles
 class Effect:
     """### Descripcion
     Con esta clase podras crear effectos pre-establecidos"""
-    def __init__(self, type: int, coords: tuple, surface: Surface, size: tuple, limit = 150, color = (100,0,0)) -> None:
+    def __init__(self, type: int, coords: tuple, surface, size: tuple, limit:int = 150, color:tuple = (100,0,0)) -> None:
+        self.fr = {
+            'type':type,
+            'coords':coords,
+            'surface':surface,
+            'size':size,
+            'limit':limit,
+            'color':color
+        }
         self.type = type
         self.surface = surface
         self.surface_rect = self.surface.get_rect()
@@ -21,14 +29,16 @@ class Effect:
             self.size = size
             self.rect = pag.rect.Rect(coords[0],coords[1],size[0],size[1])
         elif type == 2:
+            # Este es la explocion de los bloques
             self.circle_size = size
             self.down = False
         elif type == 3:
+            # Esto es para la pantalla de win
             self.particles = []
             for i in range(1,16):
                 self.particles.append(Particles(self.surface,3,False,size,3,0,
                     (self.coord),
-                    (numpy.sin(numpy.radians(24*i))*3,numpy.cos(numpy.radians(24*i))*3),
+                    (sin(radians(24*i))*3,cos(radians(24*i))*3),
                     'yellow', (random.randint(0,20),random.randint(0,20),random.randint(0,20))))
         elif self.type == 4:
             self.nose = .05
@@ -36,6 +46,7 @@ class Effect:
             self.color = color
             self.surf = pag.surface.Surface((size[0],size[1]))
         elif self.type ==5:
+            # La explosion del power up del fuego
             self.imagen = pag.transform.scale(pag.image.load('./Assets/images/explosion_3_40_128.webp'),(1200,1200))
             self.rect_image = pag.rect.Rect(0, 0, 150, 150)
             self.rect_image.center = coords
@@ -105,3 +116,5 @@ class Effect:
         pag.draw.circle(surf, (40,40,40), (radius,radius), radius)
         surf.set_colorkey((0,0,0))
         return surf
+    def reset(self) -> None:
+        self.__init__(self.fr['type'],self.fr['coords'],self.fr['surface'],self.fr['size'],self.fr['limit'],self.fr['color'])

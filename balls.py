@@ -1,10 +1,10 @@
-import pygame as pag
-from pygame.surface import Surface
+import numpy
+from pygame import image, transform, rect
 class Ball:
-    def __init__(self, pos: tuple, size: int, surface: Surface, vel: list) -> None:
-        self.image = pag.transform.scale((pag.image.load('Assets/images/pelota.png')), (size,size))
+    def __init__(self, pos: tuple, size: int, surface, vel: list) -> None:
+        self.image = transform.scale((image.load('Assets/images/pelota.png')), (size,size))
         self.pos = pos
-        self.rect = pag.rect.Rect(pos[0], pos[1], size, size)
+        self.rect = rect.Rect(pos[0], pos[1], size, size)
         self.surface = surface
         self.vel = vel
         self.explocion = False

@@ -85,7 +85,7 @@ class Set_music:
         self.pausar_musica = not self.pausar_musica
         return self.pausar_musica
 
-    def random(self, val = None):
+    def set_random(self, val = None):
         if val != None:
             self.aleatorio = val
         else:

@@ -1,5 +1,4 @@
 import pygame as pag
-from os import remove
 from pygame.locals import QUIT
 class Botons_functions:
         # -------------------------------------------------- Title Screen --------------------------------------------#
@@ -54,14 +53,14 @@ class Botons_functions:
             self.text_low_detail_mode.change_text('Low Detail Mode: O')
         else:
             self.text_low_detail_mode.change_text('Low Detail Mode: X')
-    def func_del_progress(self,appdata) -> None:
+    def func_del_progress(self) -> None:
         self.bool_title_confirm = True
         if self.title_confirm():
             self.json["lvlLimit"] = 1
             self.lvl_max = 1
             self.boton_reanudar.move((-500,-500))
             self.savejson()
-    def func_fullscreen(self):
+    def func_fullscreen(self) -> None:
         pag.display.toggle_fullscreen()
     def func_drop_music_file(self) -> None:
         self.Drop_event_bool = True
@@ -83,7 +82,7 @@ class Botons_functions:
             self.boton_pause_musica.change_text('')
         self.json["music_pause"] = p
     def func_music_random(self) -> None:
-        if r := self.music_var.random():
+        if r := self.music_var.set_random():
             self.boton_random_musica.change_text('列')
         else:
             self.boton_random_musica.change_text('')

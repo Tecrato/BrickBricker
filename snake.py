@@ -1,5 +1,5 @@
-import pygame as pag, random
-# from typing import Literal
+from pygame import draw, rect 
+from numpy import random
 from Utilidades.Animaciones import *
 from Utilidades.particles import Particles
 class Snake:
@@ -11,7 +11,7 @@ class Snake:
         self.reset()
 
 
-    def update(self) -> None: #Literal[True] | None .... para python 3.11
+    def update(self) -> None:
         cab_center = self.movimiento1.update()
         if cab_center == True:
             self.reset()
@@ -27,12 +27,12 @@ class Snake:
 
     def reset(self) -> None:
 
-        self.Cabeza = pag.rect.Rect(-200, -200, 50, 50)
-        self.cuerpo1 = pag.rect.Rect(-200, -200, 50, 50)
-        self.cuerpo2 = pag.rect.Rect(-200, -200, 45, 45)
-        self.cuerpo3 = pag.rect.Rect(-200, -200, 40, 40)
-        self.cuerpo4 = pag.rect.Rect(-200, -200, 35, 35)
-        self.cuerpo5 = pag.rect.Rect(-200, -200, 30, 30)
+        self.Cabeza = rect.Rect(-200, -200, 50, 50)
+        self.cuerpo1 = rect.Rect(-200, -200, 50, 50)
+        self.cuerpo2 = rect.Rect(-200, -200, 45, 45)
+        self.cuerpo3 = rect.Rect(-200, -200, 40, 40)
+        self.cuerpo4 = rect.Rect(-200, -200, 35, 35)
+        self.cuerpo5 = rect.Rect(-200, -200, 30, 30)
 
         self.movimiento1 = Curva_de_Bezier(60 * 7,
             [
@@ -53,21 +53,21 @@ class Snake:
 
     def draw(self) -> None:
         self.particles.draw()
-        pag.draw.rect(self.surface, (182,220,29), self.cuerpo5, border_radius=25)
-        pag.draw.rect(self.surface, (10,146,16), self.cuerpo5, 5, border_radius=25)
+        draw.rect(self.surface, (182,220,29), self.cuerpo5, border_radius=25)
+        draw.rect(self.surface, (10,146,16), self.cuerpo5, 5, border_radius=25)
 
-        pag.draw.rect(self.surface, (182,220,29), self.cuerpo4, border_radius=25)
-        pag.draw.rect(self.surface, (10,146,16), self.cuerpo4, 5, border_radius=25)
+        draw.rect(self.surface, (182,220,29), self.cuerpo4, border_radius=25)
+        draw.rect(self.surface, (10,146,16), self.cuerpo4, 5, border_radius=25)
 
-        pag.draw.rect(self.surface, (182,220,29), self.cuerpo3, border_radius=25)
-        pag.draw.rect(self.surface, (10,146,16), self.cuerpo3, 5, border_radius=25)
+        draw.rect(self.surface, (182,220,29), self.cuerpo3, border_radius=25)
+        draw.rect(self.surface, (10,146,16), self.cuerpo3, 5, border_radius=25)
 
-        pag.draw.rect(self.surface, (182,220,29), self.cuerpo2, border_radius=25)
-        pag.draw.rect(self.surface, (10,146,16), self.cuerpo2, 5, border_radius=25)
+        draw.rect(self.surface, (182,220,29), self.cuerpo2, border_radius=25)
+        draw.rect(self.surface, (10,146,16), self.cuerpo2, 5, border_radius=25)
 
-        pag.draw.rect(self.surface, (182,220,29), self.cuerpo1, border_radius=25)
-        pag.draw.rect(self.surface, (10,146,16), self.cuerpo1, 5, border_radius=25)
+        draw.rect(self.surface, (182,220,29), self.cuerpo1, border_radius=25)
+        draw.rect(self.surface, (10,146,16), self.cuerpo1, 5, border_radius=25)
 
-        pag.draw.rect(self.surface, (0,128,0), self.Cabeza, border_top_right_radius=25, 
+        draw.rect(self.surface, (0,128,0), self.Cabeza, border_top_right_radius=25, 
                       border_bottom_right_radius=25, border_bottom_left_radius=10, 
                       border_top_left_radius=10)

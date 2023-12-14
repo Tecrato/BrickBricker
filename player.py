@@ -1,15 +1,15 @@
-import pygame as pag
+from pygame import rect, draw
 from pygame.surface import Surface
 
 
 from Utilidades.Animaciones import Second_Order_Dinamics
 
 class Player:
-    def __init__(self, pos: tuple, size: int, vel: float, surface: Surface, limits: tuple):
+    def __init__(self, pos: tuple, size: int, vel: float, surface: Surface, limits: tuple) -> None:
         self.pos = pos
-        self.rect = pag.rect.Rect(pos[0], pos[1], size, size)
-        self.rect2 = pag.rect.Rect(pos[0], pos[1], size, size / 7)
-        self.rect3 = pag.rect.Rect(pos[0], pos[1], size, size / 7)
+        self.rect = rect.Rect(pos[0], pos[1], size, size)
+        self.rect2 = rect.Rect(pos[0], pos[1], size, size / 7)
+        self.rect3 = rect.Rect(pos[0], pos[1], size, size / 7)
         self.vel = vel
         self.limits = limits
         self.right = False
@@ -18,11 +18,11 @@ class Player:
         self.movimiento = Second_Order_Dinamics(1/60,1.5,1,1,self.rect2.center)
 
     def draw(self) -> None:
-        pag.draw.rect(self.surface, 'green', self.rect2)
+        draw.rect(self.surface, 'green', self.rect2)
 
     def draw2(self) -> None:
         self.rect3.center = self.movimiento.update(self.rect2.center)
-        pag.draw.rect(self.surface, (50,50,50), self.rect3)
+        draw.rect(self.surface, (50,50,50), self.rect3)
 
     def move(self,dt=1) -> None:
         if self.right and self.rect.right < self.limits[1]:
