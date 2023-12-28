@@ -15,7 +15,7 @@ class Player:
         self.right = False
         self.left = False
         self.surface = surface
-        self.movimiento = Second_Order_Dinamics(1/60,1.5,1,1,self.rect2.center)
+        self.movimiento = Second_Order_Dinamics(60,1.5,1,1,self.rect2.center)
 
     def draw(self) -> None:
         draw.rect(self.surface, 'green', self.rect2)

@@ -164,7 +164,7 @@ class BrickBricker(Botons_functions):
         self.boton_fan_lvls = Create_boton('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery),  0, color='white', with_rect=False,func=self.func_fan_lvls_title)
         self.options_text_title = Create_boton('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15),  0, color='white', with_rect=False,func=self.func_opciones)
         self.salir_text_title = Create_boton('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3),  0,color='white',color_active='darkgrey', with_rect=False)
-        self.salir_text_title.smothmove(1/60, 1, 0.73, 2)
+        self.salir_text_title.smothmove(60, 1, 0.73, 2)
         self.boton_extras = Create_boton('', 40, self.fuente_simbolos, (0,self.ventana_rect.h-20),  dire='left', color='white', with_rect=False,func=self.func_extras)
         
 
@@ -405,7 +405,7 @@ class BrickBricker(Botons_functions):
         if choque == 0:
             self.ball.pos = Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5)
             angle = Angulo(self.player.rect.center, self.ball.rect.center)
-            self.ball.vel = [numpy.cos(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel),-numpy.sin(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel)]
+            self.ball.vel = [numpy.cos(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel)]
             self.mulpliquer = 0
             self.bugueado = 0
             if not self.low_detail_mode:
@@ -1015,7 +1015,7 @@ class BrickBricker(Botons_functions):
             for i,text in sorted(enumerate(self.float_texts_list),reverse= True):
                 if text.update():
                     self.float_texts_list.pop(i)
-                text.draw(self.ventana)
+                text.draw()
 
             [x.draw(self.ventana) for x in self.texts_pause_list]
             [x.draw(self.ventana) for x in self.botones_pause_list]

@@ -44,11 +44,11 @@ class Snake:
                 ]
             , 1.3)
 
-        self.movimiento2 = Second_Order_Dinamics(1 / 60, .8, .7, 0.5, self.cuerpo1.center)
-        self.movimiento3 = Second_Order_Dinamics(1 / 60, .50, .7, 1.15, self.cuerpo2.center)
-        self.movimiento4 = Second_Order_Dinamics(1 / 60, .50, .7, 1.15, self.cuerpo3.center)
-        self.movimiento5 = Second_Order_Dinamics(1 / 60, .50, .7, 1.15, self.cuerpo4.center)
-        self.movimiento6 = Second_Order_Dinamics(1 / 60, .50, .7, 1.15, self.cuerpo4.center)
+        self.movimiento2 = Second_Order_Dinamics(60, .8, .7, 0.5, self.cuerpo1.center)
+        self.movimiento3 = Second_Order_Dinamics(60, .50, .7, 1.15, self.cuerpo2.center)
+        self.movimiento4 = Second_Order_Dinamics(60, .50, .7, 1.15, self.cuerpo3.center)
+        self.movimiento5 = Second_Order_Dinamics(60, .50, .7, 1.15, self.cuerpo4.center)
+        self.movimiento6 = Second_Order_Dinamics(60, .50, .7, 1.15, self.cuerpo4.center)
         # self.particles = Particles(self.surface)
 
     def draw(self) -> None:
