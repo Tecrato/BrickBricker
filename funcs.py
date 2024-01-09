@@ -1,5 +1,5 @@
 import pygame as pag
-from pygame.locals import QUIT
+
 class Botons_functions:
         # -------------------------------------------------- Title Screen --------------------------------------------#
     def func_reanudar(self) -> None:
@@ -19,6 +19,7 @@ class Botons_functions:
         self.title_extras()
     def func_fan_lvls_title(self) -> None:
         self.title_fan_lvls_bool = True
+        self.reload_list_for_fans_lvls()
         self.Pantalla_niveles_fans()
 
 

@@ -8,6 +8,7 @@ from sys import exit as ex
 from io import open
 from platformdirs import user_data_dir
 from Utilidades import *
+from pprint import pprint
 
 
 from balls import Ball
@@ -118,7 +119,7 @@ class BrickBricker(Botons_functions):
         self.base_de_datos = sqlite3.connect(appdata+'/'+'lvls.sqlite3')
         self.cursor = self.base_de_datos.cursor()
         try:
-            self.cursor.execute("SELECT * FROM FAN_LVLS")
+            self.cursor.execute("SELECT * FROM Niveles")
         except:
             self.base_de_datos.close()
             remove(appdata+'/'+'lvls.sqlite3')
@@ -293,7 +294,7 @@ class BrickBricker(Botons_functions):
         self.text_ganaste=Create_text(['Haz Ganado el juego','Gracias por jugar'],40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
 
         self.loading_text(84)
-        self.reload_list_for_fans_lvls()
+        # self.reload_list_for_fans_lvls()
 
     def load_json(self) -> None:
         #A hora con la posibilidad de guardar datos en un archivo json, el mundo es mas bonito
@@ -477,37 +478,31 @@ class BrickBricker(Botons_functions):
         for i,x in sorted(enumerate(self.effects_before), reverse=True):
             if x.update(dt=self.deltatime.dt):
                 self.effects_before.pop(i)
-        for x in self.effects_before:
-            x.draw()
+        [x.draw() for x in self.effects_before]
     def draw_effects_after(self) -> None:
         for i,x in sorted(enumerate(self.effects_after), reverse=True):
             if x.update(dt=self.deltatime.dt):
                 self.effects_after.pop(i)
-        for x in self.effects_after:
-            x.draw()
+        [x.draw() for x in self.effects_after]
+            
 
     def update_bloques_rects(self) -> None:
-        for b in self.bloques:
-            try:
-                b['power']
-                if b['power'] == None: raise Exception('No tiene')
-            except Exception as e:
-                if numpy.random.randint(0,10000) < 700:
-                    b['power'] = numpy.random.randint(1,6)
-                else:
-                    b['power'] = 0
         self.bloques_rects.clear()
-        for d in self.bloques:
-            self.bloques_rects.append(d['rect'])
+        for b in self.bloques:
+            if b['power'] == 0 and numpy.random.randint(0,10000) < 700:
+                b['power'] = numpy.random.randint(1,6)
+            else:
+                b['power'] = 0
+            self.bloques_rects.append(b['rect'])
 
     def load_lvl_to_DB(self,name) -> None:
-        self.cursor.execute("SELECT * FROM {n}".format(n=name))
+        self.cursor.execute("SELECT * FROM Bloques WHERE id_lvl=(SELECT id from Niveles WHERE nombre=?)",[name])
         datos = self.cursor.fetchall()
 
-        for rect, effect, color, border_radius in datos:
-            r = rect.replace('(', '').replace(')', '').split(',')
-            c = color.replace('(','').replace(')','').split(',')
-            self.bloques.append({'rect': pag.rect.Rect(int(r[0]),int(r[1]),int(r[2]),int(r[3])), 'effect': effect, 'color': (round(float(c[0])),round(float(c[1])),round(float(c[2]))), 'border_radius': border_radius})
+        for lvl,color, x, y, width, height, effect, border_radius, power in datos:
+            color = self.cursor.execute(f"SELECT red, green, blue FROM Colores WHERE id={color}")
+            color = [*color.fetchone()]
+            self.bloques.append({'rect': pag.Rect(int(x),int(y),int(width),int(height)), 'effect': effect, 'color': color, 'border_radius': border_radius,'power':power})
 
     def start(self, lvl: int) -> None:
 
@@ -541,14 +536,14 @@ class BrickBricker(Botons_functions):
 
 
         self.bloques.clear()
-        self.bloques.append({'rect': self.player.rect2, 'effect': 1, 'color': 'green', 'border_radius': 0, 'power':None})
-        self.bloques.append({'rect': self.limite_derecho, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':None})
-        self.bloques.append({'rect': self.limite_izquierdo, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':None})
-        self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':None})
-        self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':None})
+        self.bloques.append({'rect': self.player.rect2, 'effect': 1, 'color': 'green', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_derecho, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_izquierdo, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':0})
         if lvl == 1:
             for x in range(3,10):
-                self.bloques.append({'rect': pag.rect.Rect(52*x + 80,22*6 + 100, 50, 20), 'effect': 2, 'color': (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255), 'border_radius': 0})
+                self.bloques.append({'rect': pag.rect.Rect(52*x + 80,22*6 + 100, 50, 20), 'effect': 2, 'color': (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255), 'border_radius': 0, 'power':0})
         elif lvl == 2:
             lvl_map = [
                 [1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
@@ -567,12 +562,12 @@ class BrickBricker(Botons_functions):
                 color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 9:
-                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0})
+                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         elif lvl == 3:
             for y in range(5):
                 color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
                 for x in range(10):
-                    self.bloques.append({'rect': pag.rect.Rect(62 * x + 80,50 * y + 100, 60, 20), 'effect': 2, 'color': color, 'border_radius': 0})
+                    self.bloques.append({'rect': pag.rect.Rect(62 * x + 80,50 * y + 100, 60, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         elif lvl == 4:
             self.load_lvl_to_DB('espadaminecraft')
         elif lvl == 5:
@@ -588,7 +583,7 @@ class BrickBricker(Botons_functions):
         else:
             color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
             for x in range(3,10):
-                self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * 6 + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0})
+                self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * 6 + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
 
         self.update_bloques_rects()
 
@@ -625,18 +620,20 @@ class BrickBricker(Botons_functions):
         self.ball.lenta = False
 
         self.bloques.clear()
-        self.bloques.append({'rect': self.player.rect2, 'effect': 1, 'color': 'green', 'border_radius': 0})
-        self.bloques.append({'rect': self.limite_derecho, 'effect': 0, 'color': 'grey', 'border_radius': 0})
-        self.bloques.append({'rect': self.limite_izquierdo, 'effect': 0, 'color': 'grey', 'border_radius': 0})
-        self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0})
-        self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0})
+        self.bloques.append({'rect': self.player.rect2, 'effect': 1, 'color': 'green', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_derecho, 'effect': 0, 'color': 'grey', 'border_radius': 0,'power':0})
+        self.bloques.append({'rect': self.limite_izquierdo, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
+        self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':0})
 
-        self.cursor.execute("SELECT * FROM {}".format(lvl))
+        self.cursor.execute("SELECT * FROM Bloques_2 WHERE id_lvl=(SELECT id from Niveles_2 WHERE nombre=?)",[lvl])
+        datos = self.cursor.fetchall()
 
-        for rect, effect, color, border_radius, power in self.cursor.fetchall():
-            r = rect.replace('(', '').replace(')', '').split(',')
-            c = color.replace('(','').replace(')','').split(',')
-            self.bloques.append({'rect': pag.rect.Rect(int(r[0]),int(r[1]),int(r[2]),int(r[3])), 'effect': effect, 'color': (round(float(c[0])),round(float(c[1])),round(float(c[2]))), 'border_radius': border_radius, 'power': power})
+        for lvl,color, x, y, width, height, effect, border_radius, power in datos:
+            color = self.cursor.execute(f"SELECT red, green, blue FROM Colores WHERE id={color}")
+            color = [*color.fetchone()]
+            self.bloques.append({'rect': pag.Rect(int(x),int(y),int(width),int(height)), 'effect': effect, 'color': color, 'border_radius': border_radius,'power':power})
+
         self.update_bloques_rects()
 
     def eventos_en_comun(self, e) -> None:
@@ -663,11 +660,11 @@ class BrickBricker(Botons_functions):
             self.lista_cosa.select(p['index'])
 
     def reload_list_for_fans_lvls(self) -> None:
-        self.cursor.execute("SELECT * FROM FAN_LVLS")
-        perfiles = self.cursor.fetchall()
-        perfiles.sort()
+        self.cursor.execute("SELECT * FROM Niveles_2")
+        niveles = self.cursor.fetchall()
+        niveles.sort()
 
-        self.lista_fans_lvls.change_list([[x[0] for x in perfiles],[x[1] for x in perfiles]])
+        self.lista_fans_lvls.change_list([[x[0] for x in niveles],[x[1] for x in niveles]])
 
     def delete_table_in_list_for_fans_lvls(self) -> None:
         if self.lvl_fan == '' or self.lvl_fan == None or self.lvl_fan == False:

@@ -14,7 +14,6 @@ except:
     pass
 
 from Utilidades import *
-from Barras_verticales import Vertical_bars
 
 # que borre el ultimo cambio (es fliparse ya)
  
@@ -58,47 +57,47 @@ class lvl_creator_for_BrickBricker:
         self.limite_izquierdo = pag.rect.Rect(0, 0, 20, self.ventana_rect.height)
 
         #Botones 
-        self.text_boton1 = Create_text('1', 30, self.fuente_orbi_medium, (50,45), self.ventana,'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton2 = Create_text('2', 30, self.fuente_orbi_medium, (100,45), self.ventana, 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton3 = Create_text('3', 30, self.fuente_orbi_medium, (150,45), self.ventana, 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton4 = Create_text('4', 30, self.fuente_orbi_medium, (200,45), self.ventana, 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton5 = Create_text('5', 30, self.fuente_orbi_medium, (250,45), self.ventana, 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton_b = Create_text('B', 30, self.fuente_orbi_medium, (50,100), self.ventana, 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton_borrar = Create_text('', 30, self.fuente_simbolos, (50,160), self.ventana, 'center', 'black', True, 'white', border_radius=40)
-        self.text_boton_borrar_dis = Create_text(self.distancia_borrando, 20, self.fuente_orbi_medium, (50,200), self.ventana, 'center', 'white')
-        self.text_boton_color_capture = Create_text('Capturar color', 30, self.fuente_orbi_medium, (300,45), self.ventana, 'left', 'black', True, 'white', border_radius=40)
-        self.text_boton_guardar = Create_text('', 30, self.fuente_simbolos, (730,45), self.ventana, 'left', 'black', True, 'white', border_radius=40)
+        self.text_boton1 = Create_text('1', 30, self.fuente_orbi_medium, (50,45),'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton2 = Create_text('2', 30, self.fuente_orbi_medium, (100,45), 'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton3 = Create_text('3', 30, self.fuente_orbi_medium, (150,45), 'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton4 = Create_text('4', 30, self.fuente_orbi_medium, (200,45), 'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton5 = Create_text('5', 30, self.fuente_orbi_medium, (250,45), 'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton_b = Create_text('B', 30, self.fuente_orbi_medium, (50,100), 'center', 'black', True, color_rect='white', border_radius=10000)
+        self.text_boton_borrar = Create_text('', 30, self.fuente_simbolos, (50,160), 'center', 'black', True, 'white', border_radius=40)
+        self.text_boton_borrar_dis = Create_text(self.distancia_borrando, 20, self.fuente_orbi_medium, (50,200), 'center', 'white')
+        self.text_boton_color_capture = Create_text('Capturar color', 30, self.fuente_orbi_medium, (300,45), 'left', 'black', True, 'white', border_radius=40)
+        self.text_boton_guardar = Create_text('', 30, self.fuente_simbolos, (730,45), 'left', 'black', True, 'white', border_radius=40)
 
-        self.boton_back_U = Create_text('', 20, self.fuente_simbolos, (30,260), self.ventana, 'center', 'white', padding=5)
-        self.boton_next_U = Create_text('', 20, self.fuente_simbolos, (60,260), self.ventana, 'center', 'white', padding=5)
-        self.bp_x = Create_text('X', 30, self.fuente_orbi_medium, (45,300), self.ventana, 'center', 'red')
-        self.bp_1 = Create_text('', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'red')
-        self.bp_2 = Create_text('', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'lightblue')
-        self.bp_3 = Create_text('', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'orange')
-        self.bp_4 = Create_text('良', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'white')
-        self.bp_5 = Create_text('', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'white')
-        self.bp_6 = Create_text('', 30, self.fuente_simbolos, (-45,300), self.ventana, 'center', 'white')
-        self.bp_0 = Create_text('A', 30, self.fuente_mononoki, (-45,300), self.ventana, 'center', 'red')
-        self.bp_s = Create_text('select', 18, self.fuente_orbi_medium, (45,340), self.ventana, 'center', 'black', True, color_rect='white',padding=10, border_radius=10)
+        self.boton_back_U = Create_text('', 20, self.fuente_simbolos, (30,260), 'center', 'white', padding=5)
+        self.boton_next_U = Create_text('', 20, self.fuente_simbolos, (60,260), 'center', 'white', padding=5)
+        self.bp_x = Create_text('Auto', 20, self.fuente_orbi_medium, (45,300), 'center', 'red')
+        self.bp_1 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'red')
+        self.bp_2 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'lightblue')
+        self.bp_3 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'orange')
+        self.bp_4 = Create_text('良', 30, self.fuente_simbolos, (-45,300), 'center', 'white')
+        self.bp_5 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'white')
+        self.bp_6 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'white')
+        self.bp_0 = Create_text('X', 30, self.fuente_mononoki, (-45,300), 'center', 'red')
+        self.bp_s = Create_text('select', 18, self.fuente_orbi_medium, (45,340), 'center', 'black', True, color_rect='white',padding=10, border_radius=10)
 
         #Input text
-        self.text_title_guardar = Create_text('Paso final', 25, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (self.ventana_rect.centerx,self.ventana_rect.centery-70), self.ventana, 'center', 'black')
-        self.input_nombre = Input_text(self.ventana, (self.ventana_rect.centerx-95,self.ventana_rect.centery+10), (25,200), None, 'Nombre del nivel')
+        self.text_title_guardar = Create_text('Paso final', 25, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (self.ventana_rect.centerx,self.ventana_rect.centery-70), 'center', 'black')
+        self.input_nombre = Input_text((self.ventana_rect.centerx-95,self.ventana_rect.centery+10), (25,200), None, 'Nombre del nivel')
         self.all_inputs.append(self.input_nombre)
 
         self.rect_title_guardar = pag.rect.Rect(0,0,300,250)
         self.rect_title_guardar.center = self.ventana_rect.center
 
-        self.text_X = Create_text('X', 30, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (730,45), self.ventana, 'left', 'black', True, 'white', border_radius=10000)
+        self.text_X = Create_text('X', 30, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (730,45), 'left', 'black', True, 'white', border_radius=10000)
 
         #Barras Verticales
-        self.barra1 = Vertical_bars((750,250), self.ventana, 150)
+        self.barra1 = Barra_de_progreso((750,250), 150)
         self.barra1_status = False
 
-        self.barra2 = Vertical_bars((750,450), self.ventana, 150)
+        self.barra2 = Barra_de_progreso((750,450), 150)
         self.barra2_status = False
 
-        self.barra3 = Vertical_bars((750,650), self.ventana, 150)
+        self.barra3 = Barra_de_progreso((750,650), 150)
         self.barra3_status = False
 
         self.text_list = [self.text_boton1,self.text_boton2,self.text_boton3,self.text_boton4,self.text_boton5,self.text_boton_b,
@@ -110,7 +109,7 @@ class lvl_creator_for_BrickBricker:
         for x in self.powers:
             # x.smothmove(1/60,1.3,2,1)
             # x.smothmove(1/60,1.3,.8,.5)
-            x.smothmove(1/60,.9,1,1.8)
+            x.smothmove(60,.9,1,1.8)
 
         # Los colores predeterminados
         for y in range(7): # 5
@@ -141,15 +140,11 @@ class lvl_creator_for_BrickBricker:
             self.bloques_colores[i]['color'] = c
             
         #Nose algo
-        self.text_num = [Create_text(f'{n}', 20, self.fuente_orbi_medium, (-100,-100),self.ventana,'center') for n in range(10)]
+        self.text_num = [Create_text(f'{n}', 20, self.fuente_orbi_medium, (-100,-100),'center') for n in range(10)]
 
         #Crear base de datos
         self.Base_de_datos = sqlite3.connect(appdata+'/'+'lvls.sqlite3')
         self.cursor = self.Base_de_datos.cursor()
-        try:
-            self.cursor.execute('CREATE TABLE FAN_LVLS(ID INTEGER PRIMARY KEY AUTOINCREMENT,NOMBRE VARCHAR(20) UNIQUE)')
-        except:
-            pass
 
         self.start(4)
         self.Main_Process()
@@ -185,7 +180,7 @@ class lvl_creator_for_BrickBricker:
             for y in range(len(lvl_map)):
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 1:
-                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'change': True, 'power':None})
+                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
 
         if mode == 2:
             # lvl_map = []
@@ -215,66 +210,83 @@ class lvl_creator_for_BrickBricker:
             for y in range(len(lvl_map)):
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 1:
-                        self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'change': True, 'power':None})
+                        self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
 
         elif mode == 3:
             self.mucho_border_radius = True
             for y in range(16):
                 for x in range(29):
-                    self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'change': True, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':None})
             
         elif mode == 4:
             self.mucho_border_radius = False
             for y in range(18):
                 for x in range(32):
-                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'change': True, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
             
         elif mode == 5:
             self.mucho_border_radius = True
             for y in range(18):
                 for x in range(32):
-                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'change': True, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':None})
             
         self.text_boton_b.change_color('green' if self.mucho_border_radius == True else 'black')
 
                     
         self.update_bloques_rects()
 
+    def match_color(self,color: tuple[int,int,int], n=0) -> None:
+        if n > 3: return 1
+        r,g,b = color
+        self.cursor.execute("SELECT * FROM Colores WHERE red=? AND green=? AND blue=?",[r,g,b])
+        if result := self.cursor.fetchall():
+            return result[0][0]
+        else:
+            self.cursor.execute(f"INSERT INTO Colores VALUES(NULL,?,?,?)",[r,g,b])
+            self.base_de_datos_op.commit()
+        return self.match_color(color,n+1)
+    
     def Guardar(self) -> None:
         nombre = self.input_nombre.get_text()
-        nombre = nombre.replace(' ', '_')
-        try:
-            if nombre != '' and len(nombre) > 2 and len(nombre) <= 20:
-                try:
-                    self.cursor.execute("INSERT INTO FAN_LVLS VALUES(NULL,?)",[nombre])
-                    self.cursor.execute("CREATE TABLE {} (rect VARCHAR(30), effect INTEGER, color VARCHAR(20), border_radius INTEGER(3), power INTEGER(3))".format(nombre))
-                except Exception as err:
-                    messagebox(
-                        "Error",
-                        f"El perfil No pudo ser guardado\n{err}",
-                        info=False,
-                        error=1,
-                        buttons=("Ok",),
-                        return_button=1,
-                        escape_button=0,
-                    )
+        if nombre != '' and len(nombre) > 2:
+            try:
+                self.cursor.execute('INSERT INTO Niveles_2 Values(NULL,?)',[nombre])
+                lvl_id = self.cursor.fetchone()[0]
                 for a in self.bloques:
                     if a['active']:
-                        datos = [f"{a['rect'].left,a['rect'].top,a['rect'].width,a['rect'].height}",a['effect'],f"{a['color']}", a['border_radius'],a['power']]
-                        self.cursor.execute("INSERT INTO {} VALUES(?,?,?,?,?)".format(nombre),datos)
-                
+                        datos = [
+                            lvl_id,
+                            self.match_color(a['color']),
+                            a['rect'].left,
+                            a['rect'].top,
+                            a['rect'].width,
+                            a['rect'].height,
+                            a['effect'],
+                            a['border_radius'],
+                            a.get('power',0)
+                        ]
+                        self.cursor.execute("INSERT INTO Bloques_2 VALUES(?,?,?,?,?,?,?,?,?)",datos)
                 self.Base_de_datos.commit()
-            else:
-                raise Exception('Nombre no valido')
-        except Exception as err:
+            except sqlite3.IntegrityError:
+                messagebox(
+                    "Error",
+                    f"El nombre del perfil ya fue escogido",
+                    info=False,
+                    error=1,
+                    buttons=("Ok",),
+                    return_button=1,
+                    escape_button=0,
+                )
+                self.cursot.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[nombre])
+        else:
             messagebox(
                 "Error",
-                f"El perfil No pudo ser guardado\n{err}",
-                info=False,
+                "Nombre invalido",
+                warn=True,
                 error=1,
                 buttons=("Ok",),
                 return_button=1,
-                escape_button=0,
+                escape_button=1,
             )
 
     def title_guardar(self):
@@ -282,55 +294,34 @@ class lvl_creator_for_BrickBricker:
         while self.bool_title_guardar:
             self.ventana.fill('black')
             mx,my = pag.mouse.get_pos()
-            for eventos in pag.event.get():
-                if eventos.type == pag.QUIT:
+            
+            eventos = pag.event.get()
+            #Para el input
+            for en in self.all_inputs:
+                if resultado := en.eventos_teclado(eventos) == "enter" and self.all_inputs[0].get_text():
+                    self.Guardar()
+                    self.bool_title_guardar = False
+                    break
+            #Fin del input
+                    
+            for evento in eventos:
+                if evento.type == pag.QUIT:
                     pag.quit()
                     sys.exit()
-                if eventos.type == pag.KEYDOWN:
-                    if eventos.key == K_ESCAPE:
+                if evento.type == pag.KEYDOWN:
+                    if evento.key == K_ESCAPE:
                         self.bool_title_guardar = False
-                    elif eventos.key == K_F11:
+                    elif evento.key == K_F11:
                         pag.display.toggle_fullscreen()
-                    elif eventos.key == K_RETURN:
-                        self.Guardar()
+                if evento.type == MOUSEBUTTONDOWN and evento.button == 1:
+                    if self.text_X.rect.collidepoint(evento.pos):
                         self.bool_title_guardar = False
                         break
-                #Para el input
-                for x in self.all_inputs:
-                    if x.typing:
-                        if eventos.type == TEXTINPUT:
-                            x.add_letter(eventos.text)
-                        elif eventos.type == KEYDOWN and eventos.key == K_LEFT:
-                            x.left()
-                        elif eventos.type == KEYDOWN and eventos.key == K_RIGHT:
-                            x.right()
-                        elif eventos.type == KEYDOWN and eventos.key == K_BACKSPACE:
-                            x.del_letter()
-                        elif eventos.type == KEYUP and eventos.key == K_BACKSPACE:
-                            x.backspace = False
-                        elif eventos.type == KEYUP and eventos.key == K_LEFT:
-                            x.left_b = False
-                        elif eventos.type == KEYUP and eventos.key == K_RIGHT:
-                            x.right_b = False
-                #Fin del input
-
-                if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
-                    if self.text_X.rect.collidepoint(eventos.pos):
-                        self.bool_title_guardar = False
-                        break
-
-                    # Para los inputs
-                    for x in self.all_inputs:
-                        x.typing = False
-                    for x in self.all_inputs:
-                        if x.text_rect.collidepoint(eventos.pos):
-                            x.click()
-                    #Fin del input
 
             pag.draw.rect(self.ventana, 'lightgrey', self.rect_title_guardar, border_radius=20)
-            self.text_title_guardar.draw()
-            self.input_nombre.draw()
-            self.text_X.draw()
+            self.text_title_guardar.draw(self.ventana)
+            self.input_nombre.draw(self.ventana)
+            self.text_X.draw(self.ventana)
             pag.display.flip()
             self.relog.tick(60)
 
@@ -448,16 +439,14 @@ class lvl_creator_for_BrickBricker:
                     if self.text_num[alala['power']].color != color:
                         self.text_num[alala['power']].change_color(color)
                     self.text_num[alala['power']].move(alala['rect'].center)
-                    self.text_num[alala['power']].draw()
+                    self.text_num[alala['power']].draw(self.ventana)
 
             # Se dibujan los bloques de los colores
             pag.draw.rect(self.ventana, 'white', [78,498,21*13 +3,21*7 +3],2)
-            for alala in self.bloques_colores:
-                pag.draw.rect(self.ventana, alala['color'], alala['rect'])
-
+            [pag.draw.rect(self.ventana, alala['color'], alala['rect']) for alala in self.bloques_colores]
+                
             # Se dibujan los textos
-            for cosa in self.text_list:
-                cosa.draw()
+            [cosa.draw(self.ventana) for cosa in self.text_list]
 
             # logica del ...
             if self.capturando_color:
@@ -467,14 +456,14 @@ class lvl_creator_for_BrickBricker:
                         self.barra1.set_volumen(blabla['color'][0] / 255)
                         self.barra2.set_volumen(blabla['color'][1] / 255)
                         self.barra3.set_volumen(blabla['color'][2] / 255)
-            if self.barra1_status:
-                self.barra1.pulsando_volumen()
+            elif self.barra1_status:
+                self.barra1.pulsando()
                 self.color = (255*self.barra1.volumen,255*self.barra2.volumen,255*self.barra3.volumen)
             elif self.barra2_status:
-                self.barra2.pulsando_volumen()
+                self.barra2.pulsando()
                 self.color = (255*self.barra1.volumen,255*self.barra2.volumen,255*self.barra3.volumen)
             elif self.barra3_status:
-                self.barra3.pulsando_volumen()
+                self.barra3.pulsando()
                 self.color = (255*self.barra1.volumen,255*self.barra2.volumen,255*self.barra3.volumen)
 
             elif self.colocando_power and self.click:
@@ -488,19 +477,20 @@ class lvl_creator_for_BrickBricker:
             elif self.cambiando:
                 if self.brocha:
                     for x in self.bloques:
-                        if Hipotenuza(pag.mouse.get_pos(),x['rect'].center) < self.distancia_borrando:
+                        if Hipotenuza(pag.mouse.get_pos(),x['rect'].center) < self.distancia_borrando and x['cambio']:
                             x['color'] = self.color
                             if x['color'] == 'black' or ((x['color'][0] + x['color'][1] + x['color'][2]) / (255*3) < .05):
                                 x['active'] = False
                             else:
                                 x['active'] = True
                             if self.mucho_border_radius:
-                                blabla['border_radius'] = 10000
+                                x['border_radius'] = 10000
                             else:
-                                blabla['border_radius'] = 0
+                                x['border_radius'] = 0
+                            x['cambio'] = False
                 else:
                     for blabla in self.bloques:
-                        if blabla['rect'].collidepoint(pag.mouse.get_pos()) and blabla['cambio'] and blabla['change']:
+                        if blabla['rect'].collidepoint(pag.mouse.get_pos()) and blabla['cambio']:
                             blabla['color'] = self.color
                             if blabla['color'] == 'black' or ((blabla['color'][0] + blabla['color'][1] + blabla['color'][2]) / (255*3) < .05):
                                 blabla['active'] = False
