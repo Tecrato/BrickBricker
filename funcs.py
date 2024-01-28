@@ -1,4 +1,6 @@
-import pygame as pag
+import pygame as pag, requests
+
+from Utilidades.hipotenuza import Vector2
 
 class Botons_functions:
         # -------------------------------------------------- Title Screen --------------------------------------------#
@@ -6,19 +8,24 @@ class Botons_functions:
         self.title_screen = False
         self.lvl = self.lvl_max
         self.start(self.lvl_max)
+
     def func_jugar(self) -> None:
         self.title_screen = False
         self.lvl = 1
         self.start(self.lvl)
+
     def func_opciones(self) -> None:
         self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.65))
         self.options_menu()
+
     def func_extras(self) -> None:
         self.bool_title_extras = True
         self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.65))
         self.title_extras()
+
     def func_fan_lvls_title(self) -> None:
         self.title_fan_lvls_bool = True
+        self.bool_web_lvls = False
         self.reload_list_for_fans_lvls()
         self.Pantalla_niveles_fans()
 
@@ -99,3 +106,74 @@ class Botons_functions:
         self.cubic_bezier_transitions.clear()
         self.reset()
         self.Pantalla_de_titulo()
+        # -------------------------------------------------- Extra-lvls Botons --------------------------------------------#
+
+    def func_load_web_lvls(self) -> None:
+        """
+        Esta función carga los niveles desde el servidor en internet.
+        """
+        self.text_buscando_niveles.change_text('Buscando niveles')
+        self.text_buscando_niveles.smothmove(60, 2, .7, 1)
+        self.text_buscando_niveles.move(self.ventana_rect.center)
+
+
+        # self.hilos.submit(self.load_custom_lvls,(your_DB,))
+        try:
+            var = requests.get('http://Tecrato.pythonanywhere.com/api/get_all_lvls',timeout=5)
+            if var.status_code == 200:
+                lista = var.json()['niveles']
+                self.lista_fans_lvls.change_list(lista)
+                self.text_buscando_niveles.change_text('Exito')
+                self.bool_web_lvls = True
+            elif var.status_code == 404:
+                self.text_buscando_niveles.change_text('No se ah encontrado la pagina web')
+            else:
+                print(var.status_code)
+        except Exception as err:
+            print(err)
+            self.text_buscando_niveles.change_text('Verifique su conexion a internet')
+        finally:
+            self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
+            self.text_buscando_niveles.move(list(Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height)))
+        
+
+    def load_web_lvl(self,name:str) -> None:
+        self.text_buscando_niveles.change_text('Descargando nivel')
+        self.text_buscando_niveles.smothmove(60, 2, .7, 1)
+        self.text_buscando_niveles.move(self.ventana_rect.center)
+        try:
+            var = requests.get(f'http://Tecrato.pythonanywhere.com/api/get_lvl?nombre={name}',timeout=7)
+            if var.status_code == 200:
+                self.text_buscando_niveles.change_text('Exito')
+                return var.json()['bloques']
+            elif var.status_code == 404:
+                self.text_buscando_niveles.change_text('Error al nocentar con la API')
+        except Exception as err:
+            print(err)
+            self.text_buscando_niveles.change_text('Verifique su conexion a internet')
+        finally:
+            self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
+            self.text_buscando_niveles.move(list(Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height)))
+
+    # def load_custom_lvls(self,your_DB):
+    #     try:
+    #         var = requests.get('http://Tecrato.pythonanywhere.com/api/get_all_lvls',timeout=7)
+    #         if var.status_code == 200:
+    #             # self.cursor.execute("Select * FROM Niveles_2")
+    #             # your_DB = self.cursor.fetchall()
+
+    #             # [list(x)+[True] for x in var.json()['niveles']]
+    #             lista = [list(x)+[x[1] in your_DB] for x in var.json()['niveles']]
+    #             print(your_DB)
+    #             self.lista_fans_lvls.change_list(lista)
+    #             self.text_buscando_niveles.change_text('Exito')
+    #         elif var.status_code == 404:
+    #             self.text_buscando_niveles.change_text('No se ah encontrado la pagina web')
+    #         else:
+    #             print(var.status_code)
+    #     except Exception as err:
+    #         print(err)
+    #         self.text_buscando_niveles.change_text('Verifique su conexion a internet')
+    #     finally:
+    #         self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
+    #         self.text_buscando_niveles.move(list(Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height)))

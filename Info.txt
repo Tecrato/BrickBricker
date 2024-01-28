@@ -5,3 +5,7 @@ trayecto 1-2? universidad
 semana santa
 
 mucha modulacion
+
+slow motion al romper un bloque
+
+hacer que la pantalla de carga tenga engranajes mientras inicia el juego (carga tan rapido que no vale la pena)

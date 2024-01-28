@@ -84,6 +84,7 @@ class BrickBricker(Botons_functions):
         self.playing = False
         self.title_fan_lvls_bool = False
         self.title_screen = True
+        self.bool_web_lvls = False
         self.win = False
         self.relog = pag.time.Clock()
         self.framerate_general = 60
@@ -201,15 +202,19 @@ class BrickBricker(Botons_functions):
 
                                                 # La pantalla de niveles creados
         self.text_created_lvls = Create_text('Created lvls', 40, self.fuente_orbi_medium, (self.ventana_rect.centerx, 10),  'top')
-        self.boton_seleccionar = Create_boton('Seleccionar',35,None,(350,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True)
-        self.boton_borrar = Create_boton('Eliminar',35,None,(590,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True)
-        self.lista_fans_lvls= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
-            (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Id','Nombre'], colums_witdh=[0,.10])
+        self.boton_seleccionar = Create_boton('Seleccionar',35,None,(430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True)
+        self.boton_borrar = Create_boton('Eliminar',35,None,(600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True)
+        self.lista_fans_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
+            (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Id','Nombre'], 
+            colums_witdh=[0,.10], border_color=(20,20,20))
+        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= lambda: self.hilos.submit(self.func_load_web_lvls))
 
+        self.text_buscando_niveles: Create_text = Create_text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
+        self.text_buscando_niveles.smothmove(60, 2, .7, 1)
 
                                                 # Del menu de extras
         self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.extras_version = Create_text('Version 1.5.0',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
+        self.extras_version = Create_text('Version 1.6.0',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
 
 
         # Limites
@@ -268,6 +273,16 @@ class BrickBricker(Botons_functions):
             ,self.button_del_progress,self.button_toggle_fullscreen,self.boton_next_musica,self.boton_retry_musica,
             self.boton_pause_musica, self.boton_random_musica
         ]
+        # Pantalla de niveles y fans
+        self.texts_lvls_fans_list = [
+            self.text_created_lvls,
+            self.text_buscando_niveles,
+        ]
+        self.botones_lvls_fans_list = [
+            self.boton_seleccionar,
+            self.boton_borrar,
+            self.boton_web_lvls,
+        ]
 
         [x.change_color_ad('white','darkgrey') for x in self.botones_options_list]
         
@@ -294,7 +309,6 @@ class BrickBricker(Botons_functions):
         self.text_ganaste=Create_text(['Haz Ganado el juego','Gracias por jugar'],40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
 
         self.loading_text(84)
-        # self.reload_list_for_fans_lvls()
 
     def load_json(self) -> None:
         #A hora con la posibilidad de guardar datos en un archivo json, el mundo es mas bonito
@@ -619,6 +633,19 @@ class BrickBricker(Botons_functions):
         self.ball.rapida = False
         self.ball.lenta = False
 
+        if self.bool_web_lvls:
+            self.cursor.execute("SELECT * FROM Niveles_2 WHERE nombre=?",[lvl])
+            loaded = self.cursor.fetchone()
+            
+            if not loaded:
+                self.guardar_nivel(self.lvl_fan,self.load_web_lvl(self.lvl_fan))
+            
+            self.bool_web_lvls = False
+            self.reload_list_for_fans_lvls()
+            # return self.start_fan_lvl(self.lvl_fan)
+
+
+            # Cargar los bloques 
         self.bloques.clear()
         self.bloques.append({'rect': self.player.rect2, 'effect': 1, 'color': 'green', 'border_radius': 0, 'power':0})
         self.bloques.append({'rect': self.limite_derecho, 'effect': 0, 'color': 'grey', 'border_radius': 0,'power':0})
@@ -635,6 +662,46 @@ class BrickBricker(Botons_functions):
             self.bloques.append({'rect': pag.Rect(int(x),int(y),int(width),int(height)), 'effect': effect, 'color': color, 'border_radius': border_radius,'power':power})
 
         self.update_bloques_rects()
+
+    def guardar_nivel(self,name,bloques:list):
+        try:
+            self.cursor.execute('INSERT INTO Niveles_2 Values(NULL,?)',[name])
+            self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[name])
+            lvl_id = self.cursor.fetchone()[0]
+            for a in bloques:
+                datos = [
+                    lvl_id,
+                    self.match_color(a['color']),
+                    a['x'],
+                    a['y'],
+                    a['width'],
+                    a['height'],
+                    a['effect'],
+                    a['border_radius'],
+                    a.get('power',0)
+                ]
+                self.cursor.execute("INSERT INTO Bloques_2 VALUES(?,?,?,?,?,?,?,?,?)",datos)
+            self.base_de_datos.commit()
+        except sqlite3.IntegrityError:
+            messagebox(
+                "Error",
+                f"El nombre del perfil ya fue escogido",
+                info=False,
+                error=1,
+                buttons=("Ok",),
+                return_button=1,
+                escape_button=0,
+            )
+
+    def match_color(self,color: tuple[int,int,int], n=0) -> int:
+        if n > 3: return 1
+        r,g,b = color
+        self.cursor.execute("SELECT * FROM Colores WHERE red=? AND green=? AND blue=?",[r,g,b])
+        if result := self.cursor.fetchall():
+            return result[0][0]
+        self.cursor.execute("INSERT INTO Colores VALUES(NULL,?,?,?)",[r,g,b])
+        self.base_de_datos.commit()
+        return self.match_color(color,n+1)
 
     def eventos_en_comun(self, e) -> None:
         if not self.low_detail_mode: self.background.draw()
@@ -663,15 +730,17 @@ class BrickBricker(Botons_functions):
         self.cursor.execute("SELECT * FROM Niveles_2")
         niveles = self.cursor.fetchall()
         niveles.sort()
-
-        self.lista_fans_lvls.change_list([[x[0] for x in niveles],[x[1] for x in niveles]])
+        
+        self.lista_fans_lvls.change_list(niveles)
 
     def delete_table_in_list_for_fans_lvls(self) -> None:
         if self.lvl_fan == '' or self.lvl_fan == None or self.lvl_fan == False:
             return False
+        self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[self.lvl_fan])
+        su_id = self.cursor.fetchone()[0]
 
         try:
-            self.cursor.execute("DELETE FROM FAN_LVLS WHERE NOMBRE=?",[self.lvl_fan])
+            self.cursor.execute("DELETE FROM Niveles_2 WHERE nombre=?",[self.lvl_fan])
         except Exception as e:
             messagebox(
                 "Error",
@@ -683,7 +752,7 @@ class BrickBricker(Botons_functions):
                 escape_button=1,
             )
         try:
-            self.cursor.execute("DROP TABLE {}".format(self.lvl_fan))
+            self.cursor.execute("DELETE FROM Bloques_2 WHERE id_lvl=?",[su_id])
         except Exception as e:
             messagebox(
                 "Error",
@@ -778,9 +847,9 @@ class BrickBricker(Botons_functions):
                         self.bool_title_confirm = False
 
             pag.draw.rect(self.ventana, 'lightgrey', self.rect_title_confirm, border_radius=20)
-            self.text_title_confirm.draw()
-            self.input_confirm.draw()
-            self.pausa_text_X.draw()
+            self.text_title_confirm.draw(self.ventana)
+            self.input_confirm.draw(self.ventana)
+            self.pausa_text_X.draw(self.ventana)
 
             pag.display.flip()
             self.relog.tick(30)
@@ -822,10 +891,15 @@ class BrickBricker(Botons_functions):
                     if self.pausa_text_X.rect.collidepoint(eventos.pos):
                         self.title_fan_lvls_bool = False
                     if self.boton_seleccionar.rect.collidepoint(eventos.pos):
-                        if self.lvl_fan:
+                        if self.bool_web_lvls:
+                            # self.hilos.submit(self.load_web_lvl,self.lvl_fan)
+                            self.start_fan_lvl(self.lvl_fan)
+                        elif self.lvl_fan:
                             self.title_screen = False
                             self.title_fan_lvls_bool = False
                             self.start_fan_lvl(self.lvl_fan)
+                    if self.boton_web_lvls.rect.collidepoint(eventos.pos):
+                        self.boton_web_lvls.click()
                     if self.boton_borrar.rect.collidepoint(eventos.pos):
                         self.bool_title_confirm = True
                         if self.title_confirm():
@@ -844,6 +918,9 @@ class BrickBricker(Botons_functions):
             self.lista_fans_lvls.draw(self.ventana)
             self.boton_borrar.draw(self.ventana)
             self.boton_seleccionar.draw(self.ventana)
+            self.text_buscando_niveles.draw(self.ventana)
+
+            self.boton_web_lvls.draw(self.ventana)
             
 
             pag.display.flip()
@@ -878,8 +955,8 @@ class BrickBricker(Botons_functions):
             self.relog.tick(60)
 
     def options_menu(self) -> None:
-        self.options_while = True
-        while self.options_while:
+        self.title_screen_options_bool = True
+        while self.title_screen_options_bool:
             self.eventos_en_comun(evento:=pag.event.get())
 
             for eventos in evento:
@@ -895,7 +972,7 @@ class BrickBricker(Botons_functions):
                             self.lista_cosa.change_list(self.music_var.canciones)
                             self.lista_cosa.select(p['index'])
                 if eventos.type == KEYDOWN and eventos.key == K_ESCAPE:
-                    self.options_while = False
+                    self.title_screen_options_bool = False
                     self.savejson()
                     self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.3))
                 if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
@@ -911,7 +988,7 @@ class BrickBricker(Botons_functions):
                     if self.salir_text_title.rect.collidepoint(eventos.pos):
                         self.sounds.boton1.play()
                         self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.3))
-                        self.options_while = False
+                        self.title_screen_options_bool = False
                         self.savejson()
 
                     elif self.BV_Volumen_Musica.rect2.collidepoint(eventos.pos):

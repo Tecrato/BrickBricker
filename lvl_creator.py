@@ -243,7 +243,7 @@ class lvl_creator_for_BrickBricker:
             return result[0][0]
         else:
             self.cursor.execute(f"INSERT INTO Colores VALUES(NULL,?,?,?)",[r,g,b])
-            self.base_de_datos_op.commit()
+            self.base_de_datos.commit()
         return self.match_color(color,n+1)
     
     def Guardar(self) -> None:
@@ -277,7 +277,6 @@ class lvl_creator_for_BrickBricker:
                     return_button=1,
                     escape_button=0,
                 )
-                self.cursot.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[nombre])
         else:
             messagebox(
                 "Error",
