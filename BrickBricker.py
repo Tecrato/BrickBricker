@@ -1,5 +1,5 @@
 import pygame as pag, numpy, sqlite3, json
-from os import mkdir, remove
+from os import mkdir, remove, path
 from concurrent.futures import ThreadPoolExecutor
 from shutil import copy as shutil_copy
 from pygame._sdl2 import messagebox
@@ -25,14 +25,11 @@ from sound import Set_sounds
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
 
-try:
+
+if not path.isdir('/'.join(appdata.split('\\')[:-1])):
     mkdir('/'.join(appdata.split('\\')[:-1]))
-except:
-    pass
-try:
+if not path.isdir(appdata):
     mkdir(appdata)
-except:
-    pass
 
 
 class BrickBricker(Botons_functions):
@@ -56,6 +53,7 @@ class BrickBricker(Botons_functions):
         #Variedad en las variables
         self.hilos = ThreadPoolExecutor(2)
 
+        # Cuenta contador, y saca cuenta
         self.life = 3
         self.lvl = 1
         self.lvl_fan = ''
@@ -63,6 +61,8 @@ class BrickBricker(Botons_functions):
         self.score = 0
         self.mulpliquer = 0
         self.bugueado = 0
+
+        # Listas, y las que faltan
         self.all_inputs = []
         self.bloques = []
         self.bloques_rects = []
@@ -72,6 +72,8 @@ class BrickBricker(Botons_functions):
         self.float_texts_list = []
         self.powers = []
         self.sparks = []
+
+        # Muchas verdades y falsedades
         self.acercandose = False
         self.alive = True
         self.bool_final_lvl = False
@@ -79,19 +81,21 @@ class BrickBricker(Botons_functions):
         self.Drop_event_bool = False
         self.fan_lvl_bool = False
         self.low_detail_mode = False
-        self.options_while = False
+        self.title_screen_options_bool = False
         self.pausado = False
         self.playing = False
         self.title_fan_lvls_bool = False
         self.title_screen = True
         self.bool_web_lvls = False
         self.win = False
+
+        # Para los FPS y deltatime
         self.relog = pag.time.Clock()
         self.framerate_general = 60
         self.framerate_dificultad = 90
 
         self.txt = Create_text('Cargando 0%',50,None,(400,350),color='white',padding=100,with_rect=True)
-        self.txt.draw(self.ventana)
+        self.loading_text('0')
         pag.display.flip()
 
         self.inilializar_juego()
@@ -214,7 +218,7 @@ class BrickBricker(Botons_functions):
 
                                                 # Del menu de extras
         self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.extras_version = Create_text('Version 1.6.0',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
+        self.extras_version = Create_text('Version 1.6.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
 
 
         # Limites
@@ -299,7 +303,6 @@ class BrickBricker(Botons_functions):
             x.with_rect = False
 
         self.loading_text(64)
-
         self.particles_ball = Particles(self.ventana, 2)
         self.background = Background(self.ventana,(800,700),2)
         self.background2 = Background(self.ventana,(800,700),3)
@@ -318,82 +321,63 @@ class BrickBricker(Botons_functions):
             self.json = {}
 
         # Para el nivel maximo
-        try:
-            self.lvl_max = self.json["lvlLimit"]
-            if self.lvl_max > 1: self.boton_reanudar.move((self.ventana_rect.centerx,self.ventana_rect.centery * .85))
-        except Exception as e:
-            self.json["lvlLimit"] = 1
+            
+        self.json.setdefault("lvlLimit",1)
+        self.lvl_max = self.json['lvlLimit']
+        if self.lvl_max > 1:
+            self.boton_reanudar.move((self.ventana_rect.centerx,self.ventana_rect.centery * .85))
 
         # Para los scores
-        try:
-            self.json["lvl_scores"]
-        except Exception as e:
-            self.json["lvl_scores"] = {}
-        try:
-            self.json["fan_lvl_scores"]
-        except Exception as e:
-            self.json["fan_lvl_scores"] = {}
+        self.json.setdefault("lvl_scores",{})
+        self.json.setdefault("fan_lvl_scores",{})
 
         # Para el "Aleatorio" en la musica
-        try:
-            if self.json["music_random"]:
-                self.boton_random_musica.change_text('列')
-            else:
-                self.boton_random_musica.change_text('')
-            self.music_var.set_random(self.json["music_random"])
-        except:
-            self.json["music_random"] = True
+        self.json.setdefault("music_random",True)
+        if self.json["music_random"]:
+            self.boton_random_musica.change_text('列')
+        else:
+            self.boton_random_musica.change_text('')
+        self.music_var.set_random(self.json["music_random"])
 
         # El directorio de la musica
-        try:
-            if self.json["music_dir"] != None and self.json["music_dir"] != '':
-                p = self.music_var.load_music(self.json["music_dir"])
-                self.text_song.change_text(p['text'])
-                if len(self.music_var.canciones) > 0:
-                    self.lista_cosa.change_list(self.music_var.canciones)
-                    self.lista_cosa.select(p['index'])
-        except:
-            self.json["music_dir"] = None
+        self.json.setdefault("music_random",True)
+        self.json.setdefault("music_dir",None)
+
+        if self.json["music_dir"] != None and self.json["music_dir"] != '':
+            p = self.music_var.load_music(self.json["music_dir"])
+            self.text_song.change_text(p['text'])
+            if len(self.music_var.canciones) > 0:
+                self.lista_cosa.change_list(self.music_var.canciones)
+                self.lista_cosa.select(p['index'])
 
         # Si la musica esta pausada
-        try:
-            if self.json["music_pause"] == True:
-                self.music_var.pause(True)
-                self.boton_pause_musica.change_text('')
-            else:
-                self.boton_pause_musica.change_text('')
-        except:
-            self.json["music_pause"] = False
+        self.json.setdefault("music_pause",False)
+        if self.json["music_pause"]:
+            self.music_var.pause(True)
+            self.boton_pause_musica.change_text('')
+        else:
+            self.boton_pause_musica.change_text('')
         
 
         # Para rendimientos bajos
-        try:
-            self.low_detail_mode = self.json['low_detail']
-        except:
-            self.json['low_detail'] = self.low_detail_mode
-            if self.low_detail_mode:
-                self.text_low_detail_mode.change_text('Low Detail Mode: O')
-            else:
-                self.text_low_detail_mode.change_text('Low Detail Mode: X')
+        self.json.setdefault("low_detail",False)
+        self.low_detail_mode = self.json['low_detail']
+        if self.low_detail_mode:
+            self.text_low_detail_mode.change_text('Low Detail Mode: O')
+        else:
+            self.text_low_detail_mode.change_text('Low Detail Mode: X')
 
         #El volumen de la musica
-        try:
-            self.BV_Volumen_Musica.set_volumen(self.json["music_volumen"])
-        except:
-            self.json["music_volumen"] = .5
+        self.json.setdefault("music_volumen",.5)
+
         #El volumen de los sonidos
-        try:
-            self.BV_Volumen_Sonidos.set_volumen(self.json["sound_volumen"])
-            self.sounds.set_volumen(self.json["sound_volumen"])
-        except:
-            self.json["sound_volumen"] = .5
+        self.json.setdefault("sound_volumen",.5)
+        self.BV_Volumen_Sonidos.set_volumen(self.json["sound_volumen"])
+        self.sounds.set_volumen(self.json["sound_volumen"])
 
         # El nivel de dificultad
-        try:
-            self.func_change_difficult(self.json['difficult'])
-        except:
-            self.json["difficult"] = 2
-            self.func_change_difficult(2)
+        self.json.setdefault("difficult",2)
+        self.func_change_difficult(self.json['difficult'])
 
         self.savejson()
 
@@ -403,19 +387,19 @@ class BrickBricker(Botons_functions):
 
 
     def colicion(self) -> None:
-        choque:int = self.ball.rect.collidelist(self.bloques_rects)
-        if choque > 0:
+        choque = self.ball.rect.collidelistall(self.bloques_rects)
+        if len(choque) == 0:
+            choque = -1
+        elif len(choque) == 1:
             self.ball.retroceder(self.deltatime_ball.dt)
-            self.ball.update(.5)
+            while self.ball.rect.collidelist(self.bloques_rects) == -1:
+                self.ball.update(.1)
             choque = self.ball.rect.collidelist(self.bloques_rects)
-        try:
-            if choque2 := self.ball.rect.collidelistall(self.bloques_rects):
-                b1 = Hipotenuza(self.ball.rect.center,self.bloques[choque]['rect'].center)
-                b2 = Hipotenuza(self.ball.rect.center,self.bloques[choque2[1]]['rect'].center)
-                if b1 > b2: choque = choque2[1]
-                else: choque = choque
-        except Exception as e:
-            pass
+        elif len(choque) > 1:
+            self.ball.retroceder(self.deltatime_ball.dt)
+            choque = sorted(choque,key=lambda num:Hipotenuza(self.ball.rect.center,self.bloques[num]['rect'].center))[0]
+
+
 
         if choque == 0:
             self.ball.pos = Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5)
@@ -454,6 +438,7 @@ class BrickBricker(Botons_functions):
                 if (self.ball.rect.centery < self.bloques[choque]['rect'].top and self.ball.vel[1] > 0) or (
                     self.ball.rect.centery > self.bloques[choque]['rect'].bottom and self.ball.vel[1] < 0):
                     self.ball.vel[1] *= -1
+
 
         if choque > -1 and self.bloques[choque]['effect'] == 1:
             if self.bloques[choque]['rect'] == self.player.rect2:
@@ -653,6 +638,7 @@ class BrickBricker(Botons_functions):
         self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
         self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':0})
 
+
         self.cursor.execute("SELECT * FROM Bloques_2 WHERE id_lvl=(SELECT id from Niveles_2 WHERE nombre=?)",[lvl])
         datos = self.cursor.fetchall()
 
@@ -744,7 +730,7 @@ class BrickBricker(Botons_functions):
         except Exception as e:
             messagebox(
                 "Error",
-                "A ocurrido un error al eliminar el nivel",
+                f"A ocurrido un error al eliminar el nivel\n{e}",
                 info=False,
                 error=1,
                 buttons=("Ok",),
@@ -756,7 +742,7 @@ class BrickBricker(Botons_functions):
         except Exception as e:
             messagebox(
                 "Error",
-                "A ocurrido un error al eliminar la tabla del nivel",
+                f"A ocurrido un error al eliminar la tabla del nivel\n{e}",
                 info=False,
                 error=1,
                 buttons=("Ok",),
@@ -766,6 +752,7 @@ class BrickBricker(Botons_functions):
         self.lvl_fan = ''
         self.base_de_datos.commit()
         self.reload_list_for_fans_lvls()
+
 
     def appli_powerup(self, type) -> None:
         if type == 1:
