@@ -9,3 +9,5 @@ mucha modulacion
 slow motion al romper un bloque
 
 hacer que la pantalla de carga tenga engranajes mientras inicia el juego (carga tan rapido que no vale la pena)
+
+Hacer una clase que maneje los niveles (Guardarlos, cargarlos, descargarlos, eliminarlos, y lo que se me ocurra)

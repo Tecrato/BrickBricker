@@ -116,5 +116,6 @@ class Effect:
         pag.draw.circle(surf, (40,40,40), (radius,radius), radius)
         surf.set_colorkey((0,0,0))
         return surf
+    
     def reset(self) -> None:
         self.__init__(self.fr['type'],self.fr['coords'],self.fr['surface'],self.fr['size'],self.fr['limit'],self.fr['color'])

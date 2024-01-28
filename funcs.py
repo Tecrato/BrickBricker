@@ -154,26 +154,3 @@ class Botons_functions:
         finally:
             self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
             self.text_buscando_niveles.move(list(Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height)))
-
-    # def load_custom_lvls(self,your_DB):
-    #     try:
-    #         var = requests.get('http://Tecrato.pythonanywhere.com/api/get_all_lvls',timeout=7)
-    #         if var.status_code == 200:
-    #             # self.cursor.execute("Select * FROM Niveles_2")
-    #             # your_DB = self.cursor.fetchall()
-
-    #             # [list(x)+[True] for x in var.json()['niveles']]
-    #             lista = [list(x)+[x[1] in your_DB] for x in var.json()['niveles']]
-    #             print(your_DB)
-    #             self.lista_fans_lvls.change_list(lista)
-    #             self.text_buscando_niveles.change_text('Exito')
-    #         elif var.status_code == 404:
-    #             self.text_buscando_niveles.change_text('No se ah encontrado la pagina web')
-    #         else:
-    #             print(var.status_code)
-    #     except Exception as err:
-    #         print(err)
-    #         self.text_buscando_niveles.change_text('Verifique su conexion a internet')
-    #     finally:
-    #         self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
-    #         self.text_buscando_niveles.move(list(Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height)))

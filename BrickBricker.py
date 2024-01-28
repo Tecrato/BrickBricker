@@ -94,13 +94,13 @@ class BrickBricker(Botons_functions):
         self.framerate_general = 60
         self.framerate_dificultad = 90
 
-        self.txt = Create_text('Cargando 0%',50,None,(400,350),color='white',padding=100,with_rect=True)
+        self.txt = Create_text(['Cargando 0%','Cargando'],50,None,(400,350),color='white',padding=100,with_rect=True)
         self.loading_text('0')
         pag.display.flip()
 
         self.inilializar_juego()
         
-        self.loading_text(90)
+        self.loading_text('90','Load Config\'s')
 
         pag.mixer_music.set_volume(0)
         self.load_json()
@@ -112,8 +112,8 @@ class BrickBricker(Botons_functions):
         self.Pantalla_de_titulo()
         self.Main_Process()
 
-    def loading_text(self,n):
-        self.txt.change_text(f'Cargando {n}%')
+    def loading_text(self,n, txt = 'Load resources'):
+        self.txt.change_text([f'Cargando {n}%',txt])
         self.txt.draw(self.ventana)
         pag.display.flip()
 
@@ -218,7 +218,7 @@ class BrickBricker(Botons_functions):
 
                                                 # Del menu de extras
         self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.extras_version = Create_text('Version 1.6.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
+        self.extras_version = Create_text('Version 1.6.2',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
 
 
         # Limites
@@ -350,6 +350,8 @@ class BrickBricker(Botons_functions):
                 self.lista_cosa.change_list(self.music_var.canciones)
                 self.lista_cosa.select(p['index'])
 
+        self.loading_text('95','Load Config\'s')
+
         # Si la musica esta pausada
         self.json.setdefault("music_pause",False)
         if self.json["music_pause"]:
@@ -379,6 +381,8 @@ class BrickBricker(Botons_functions):
         self.json.setdefault("difficult",2)
         self.func_change_difficult(self.json['difficult'])
 
+        self.loading_text('99','Load Config\'s')
+
         self.savejson()
 
     def savejson(self) -> None:
@@ -402,9 +406,9 @@ class BrickBricker(Botons_functions):
 
 
         if choque == 0:
-            self.ball.pos = Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5)
+            self.ball.set_pos(Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5))
             angle = Angulo(self.player.rect.center, self.ball.rect.center)
-            self.ball.vel = [numpy.cos(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel)]
+            self.ball.set_vel([numpy.cos(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel)])
             self.mulpliquer = 0
             self.bugueado = 0
             if not self.low_detail_mode:
@@ -430,7 +434,7 @@ class BrickBricker(Botons_functions):
                 
             if self.bloques[choque]['border_radius'] == 10000:
                 angle = Angulo(self.bloques[choque]['rect'].center, self.ball.rect.center)
-                self.ball.vel=Vector2(numpy.cos(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel))
+                self.ball.set_vel(Vector2(numpy.cos(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel)))
             else:
                 if (self.ball.rect.centerx < self.bloques[choque]['rect'].left and self.ball.vel[0] > 0) or (
                     self.ball.rect.centerx > self.bloques[choque]['rect'].right and self.ball.vel[0] < 0):
@@ -512,8 +516,8 @@ class BrickBricker(Botons_functions):
         self.life_text.change_text(f'Lives {self.life}')
         self.lvl_text.change_text(f'Nivel: {self.lvl}')
         self.score_text.change_text('Score 0')
-        self.ball.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.7)
-        self.ball.vel = [0,-4]
+        self.ball.set_pos((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7))
+        self.ball.set_vel([0,-4])
         self.ball.update()
         self.particles_ball.clear()
         self.particles_ball.con = 0
@@ -596,8 +600,8 @@ class BrickBricker(Botons_functions):
         self.life_text.change_text(f'Lives 3')
         self.lvl_text.change_text(f'Nivel: {self.lvl_fan}')
         self.score_text.change_text(f'Score 0')
-        self.ball.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.7)
-        self.ball.vel = [0,-4]
+        self.ball.set_pos((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7))
+        self.ball.set_vel([0,-4])
         self.ball.update()
         self.particles_ball.clear()
         self.particles_ball.con = 0
