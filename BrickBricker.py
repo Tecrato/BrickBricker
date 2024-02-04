@@ -218,7 +218,7 @@ class BrickBricker(Botons_functions):
 
                                                 # Del menu de extras
         self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.extras_version = Create_text('Version 1.6.2',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
+        self.extras_version = Create_text('Version 1.6.3',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
 
 
         # Limites
@@ -395,7 +395,8 @@ class BrickBricker(Botons_functions):
         if len(choque) == 0:
             choque = -1
         elif len(choque) == 1:
-            self.ball.retroceder(self.deltatime_ball.dt)
+            while self.ball.rect.collidelist(self.bloques_rects) != -1:
+                self.ball.retroceder(.1)
             while self.ball.rect.collidelist(self.bloques_rects) == -1:
                 self.ball.update(.1)
             choque = self.ball.rect.collidelist(self.bloques_rects)
@@ -804,6 +805,7 @@ class BrickBricker(Botons_functions):
         pag.time.set_timer(USEREVENT+2,500000000,-1)
         self.ball.rapida = False
         self.ball.lenta = False
+        self.ball.explocion = False
 
     def loss(self) -> bool:
         if self.life <= 0 and self.alive == True:
@@ -1163,18 +1165,18 @@ class BrickBricker(Botons_functions):
             # -------------------------------------------------------  Logica   ------------------------------------------
             self.loss()
 
-            if len(self.bloques) == 6 and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 130:
+            if len(self.bloques) == 6 and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 170:
                 angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)/360
                 angulo2 = Angulo((0,0),self.ball.vel)/360
-                if 0<numpy.abs(angulo1-angulo2)<.3:
-                    if not self.acercandose:
+                if 0<numpy.abs(angulo1-angulo2)<.3 or Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 170:
+                    if not self.acercandose and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 100:
                         self.acercandose = True
                         self.sounds.casi.play()
-                    self.deltatime_ball.FPS = max(15,(Hipotenuza(self.ball.rect.center,self.bloques[-1]['rect'].center)/90)*self.framerate_dificultad)
+                    self.deltatime_ball.FPS = max(10,(Hipotenuza(self.ball.rect.center,self.bloques[-1]['rect'].center)/170)*self.framerate_dificultad)
                 else:
                     if self.acercandose:
                         self.acercandose = False
-                        if len(self.bloques) > 5:
+                        if len(self.bloques) == 6:
                             self.sounds.casi.stop()
                             self.sounds.decepcion.play()
                     self.acercandose = False
@@ -1199,7 +1201,7 @@ class BrickBricker(Botons_functions):
 
             if not self.win and self.alive and self.playing:
                 self.bugueado += 1
-            if self.bugueado > 10*self.deltatime_ball.FPS:
+            if self.bugueado > 10*self.framerate_general:
                 self.ball.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.7)
                 self.ball.vel = [0,-4]
                 self.playing = False

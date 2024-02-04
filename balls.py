@@ -3,10 +3,10 @@ from pygame import image, transform, rect
 class Ball:
     def __init__(self, pos: tuple, size: int, surface, vel: list) -> None:
         self.image = transform.scale((image.load('Assets/images/pelota.png')), (size,size))
-        self.pos = numpy.ndarray(pos)
+        self.pos = numpy.array(pos)
         self.rect = rect.Rect(pos[0], pos[1], size, size)
         self.surface = surface
-        self.vel = numpy.ndarray(vel)
+        self.vel = numpy.array(vel)
         self.explocion = False
         self.lenta = False
         self.rapida = False
@@ -23,6 +23,6 @@ class Ball:
         self.surface.blit(self.image, self.rect)
 
     def set_vel(self,vel) -> None:
-        self.vel = numpy.ndarray(vel)
+        self.vel = numpy.array(vel)
     def set_pos(self,pos) -> None:
-        self.pos = numpy.ndarray(pos)
+        self.pos = numpy.array(pos)

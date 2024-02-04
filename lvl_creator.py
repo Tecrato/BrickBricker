@@ -251,6 +251,7 @@ class lvl_creator_for_BrickBricker:
         if nombre != '' and len(nombre) > 2:
             try:
                 self.cursor.execute('INSERT INTO Niveles_2 Values(NULL,?)',[nombre])
+                self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[nombre])
                 lvl_id = self.cursor.fetchone()[0]
                 for a in self.bloques:
                     if a['active']:

@@ -37,9 +37,11 @@ class Effect:
             self.particles = []
             for i in range(1,16):
                 self.particles.append(Particles(self.surface,3,False,size,3,0,
-                    (self.coord),
+                    self.coord,
                     (sin(radians(24*i))*3,cos(radians(24*i))*3),
                     'yellow', (random.randint(0,20),random.randint(0,20),random.randint(0,20))))
+                # print(sin(radians(24*i))*3,cos(radians(24*i))*3)
+                
         elif self.type == 4:
             self.nose = .05
             self.color_grade = 0.001
