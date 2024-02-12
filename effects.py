@@ -113,7 +113,7 @@ class Effect:
         elif self.type == 5:
             self.surface.blit(self.imagen, self.rect_image, self.lista_rects[self.count // round(self.limit / len(self.lista_rects))])
 
-    def lighting_func(self,radius):
+    def lighting_func(self,radius) -> pag.Surface:
         surf = pag.surface.Surface((radius*2,radius*2))
         pag.draw.circle(surf, (40,40,40), (radius,radius), radius)
         surf.set_colorkey((0,0,0))

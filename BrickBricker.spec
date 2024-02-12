@@ -53,15 +53,6 @@ exe = EXE(
 )
 
 
-# build_options = {
-#     'build': {
-#         'executable': '/path/to/pypy3',
-#         'force_32bit': True,
-#         'optimize': 2,
-#         'include_msvcr': True
-#     }
-# }
-
 build_options = {
     'build': {
         'optimize': 2,

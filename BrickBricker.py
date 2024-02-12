@@ -1,8 +1,6 @@
-import pygame as pag, numpy, sqlite3, json
-from os import mkdir, remove, path
+import pygame as pag, numpy, json
+from os import mkdir, path, startfile
 from concurrent.futures import ThreadPoolExecutor
-from shutil import copy as shutil_copy
-from pygame._sdl2 import messagebox
 from pygame.locals import *
 from sys import exit as ex
 from io import open
@@ -21,6 +19,9 @@ from player import Player
 from powers import PowerUp
 from snake import Snake
 from sound import Set_sounds
+
+from lvl_manager import Lvl_manager
+
 
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
@@ -78,6 +79,7 @@ class BrickBricker(Botons_functions):
         self.alive = True
         self.bool_final_lvl = False
         self.bool_title_confirm = False
+        self.bool_web_lvls = False
         self.Drop_event_bool = False
         self.fan_lvl_bool = False
         self.low_detail_mode = False
@@ -86,7 +88,6 @@ class BrickBricker(Botons_functions):
         self.playing = False
         self.title_fan_lvls_bool = False
         self.title_screen = True
-        self.bool_web_lvls = False
         self.win = False
 
         # Para los FPS y deltatime
@@ -120,17 +121,8 @@ class BrickBricker(Botons_functions):
 
     def inilializar_juego(self) -> None:
 
-        # Leer base de datos
-        self.base_de_datos = sqlite3.connect(appdata+'/'+'lvls.sqlite3')
-        self.cursor = self.base_de_datos.cursor()
-        try:
-            self.cursor.execute("SELECT * FROM Niveles")
-        except:
-            self.base_de_datos.close()
-            remove(appdata+'/'+'lvls.sqlite3')
-            shutil_copy('./lvls.sqlite3',appdata+'/'+'lvls.sqlite3')
-            self.base_de_datos = sqlite3.connect(appdata+'/'+'lvls.sqlite3')
-            self.cursor = self.base_de_datos.cursor()
+        # Base de datos
+        self.lvl_manager = Lvl_manager(appdata+'/'+'lvls.sqlite3')
 
         # Fuentes
         self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
@@ -204,24 +196,39 @@ class BrickBricker(Botons_functions):
         
         self.loading_text(28)
 
+
                                                 # La pantalla de niveles creados
         self.text_created_lvls = Create_text('Created lvls', 40, self.fuente_orbi_medium, (self.ventana_rect.centerx, 10),  'top')
-        self.boton_seleccionar = Create_boton('Seleccionar',35,None,(430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True)
-        self.boton_borrar = Create_boton('Eliminar',35,None,(600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True)
+        self.boton_seleccionar = Create_boton('Seleccionar',35,None,(430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True, func=self.select_lvl)
+        self.boton_borrar = Create_boton('Eliminar',35,None,(600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True, func=self.borrar_lvl)
         self.lista_fans_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
             (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Id','Nombre'], 
-            colums_witdh=[0,.10], border_color=(20,20,20))
-        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= lambda: self.hilos.submit(self.func_load_web_lvls))
+            colums_witdh=[0,.10], border_color=(20,20,20)) # (self.ventana_rect.width*.1, self.ventana_rect.height*.15)
+        
+        # Para niveles web
+        self.boton_seleccionar_web = Create_boton('Seleccionar',35,None,(self.ventana_rect.w+430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True, func=self.select_lvl_web)
+        self.boton_borrar_web = Create_boton('Eliminar',35,None,(self.ventana_rect.w+600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True)
+        self.lista_web_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
+            (self.ventana_rect.width*1.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Web_id','Nombre'], 
+            colums_witdh=[0,.15], border_color=(20,20,20))
+        
+        self.boton_custom_lvls = Create_boton('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= lambda: self.hilos.submit(self.func_load_custom_lvls))
+        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= lambda: self.hilos.submit(self.func_see_web_lvls))
+        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda: self.hilos.submit(self.func_load_web_lvls))
+        [x.smothmove(60, 1, .7, 1) for x in [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]]
 
         self.text_buscando_niveles: Create_text = Create_text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
         self.text_buscando_niveles.smothmove(60, 2, .7, 1)
 
+
                                                 # Del menu de extras
-        self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.extras_version = Create_text('Version 1.6.3',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery), self.ventana)
+        self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
+        self.extras_version = Create_text('Version 1.7',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
+        self.social_media_github_button = Create_boton('',30,self.fuente_simbolos, (10,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://github.com/Tecrato'))
+        self.social_media_youtube_button = Create_boton('輸',30,self.fuente_simbolos, (70,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://youtube.com/channel/UCeMfUcvDXDw2TPh-b7UO1Rw'))
 
 
-        # Limites
+        # Limites 
         self.limite_inferior = pag.rect.Rect(0, self.ventana_rect.height-15, self.ventana_rect.width, 50)
         self.limite_superior = pag.rect.Rect(-50, -47, self.ventana_rect.width+150, 50)
         self.limite_derecho = pag.rect.Rect(self.ventana_rect.width-2, -50, 50, self.ventana_rect.height+100)
@@ -282,10 +289,14 @@ class BrickBricker(Botons_functions):
             self.text_created_lvls,
             self.text_buscando_niveles,
         ]
-        self.botones_lvls_fans_list = [
+        self.botones_custom_lvls_list = [
             self.boton_seleccionar,
+            self.boton_seleccionar_web,
             self.boton_borrar,
+            self.boton_borrar_web,
             self.boton_web_lvls,
+            self.boton_custom_lvls,
+            self.boton_reload_web_lvls,
         ]
 
         [x.change_color_ad('white','darkgrey') for x in self.botones_options_list]
@@ -308,6 +319,9 @@ class BrickBricker(Botons_functions):
         self.background2 = Background(self.ventana,(800,700),3)
         self.deltatime = Deltatime(90)
         self.deltatime_ball = Deltatime(90)
+
+        Effect(5,(350,350), self.ventana, 100).draw()
+        Effect(5,(350,350), self.ventana, 100).reset()
 
         self.text_ganaste=Create_text(['Haz Ganado el juego','Gracias por jugar'],40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
 
@@ -350,7 +364,6 @@ class BrickBricker(Botons_functions):
                 self.lista_cosa.change_list(self.music_var.canciones)
                 self.lista_cosa.select(p['index'])
 
-        self.loading_text('95','Load Config\'s')
 
         # Si la musica esta pausada
         self.json.setdefault("music_pause",False)
@@ -391,20 +404,7 @@ class BrickBricker(Botons_functions):
 
 
     def colicion(self) -> None:
-        choque = self.ball.rect.collidelistall(self.bloques_rects)
-        if len(choque) == 0:
-            choque = -1
-        elif len(choque) == 1:
-            while self.ball.rect.collidelist(self.bloques_rects) != -1:
-                self.ball.retroceder(.1)
-            while self.ball.rect.collidelist(self.bloques_rects) == -1:
-                self.ball.update(.1)
-            choque = self.ball.rect.collidelist(self.bloques_rects)
-        elif len(choque) > 1:
-            self.ball.retroceder(self.deltatime_ball.dt)
-            choque = sorted(choque,key=lambda num:Hipotenuza(self.ball.rect.center,self.bloques[num]['rect'].center))[0]
-
-
+        choque = self.ball.check_colision(self.bloques_rects, self.deltatime_ball.dt)
 
         if choque == 0:
             self.ball.set_pos(Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5))
@@ -478,52 +478,28 @@ class BrickBricker(Botons_functions):
                 self.bloques.pop(choque)
             self.sounds.ball_pop.play()
 
-    def draw_effects_before(self) -> None:
-        for i,x in sorted(enumerate(self.effects_before), reverse=True):
+    def draw_effects(self, effects_list) -> None:
+        for i,x in sorted(enumerate(effects_list), reverse=True):
             if x.update(dt=self.deltatime.dt):
-                self.effects_before.pop(i)
-        [x.draw() for x in self.effects_before]
-    def draw_effects_after(self) -> None:
-        for i,x in sorted(enumerate(self.effects_after), reverse=True):
-            if x.update(dt=self.deltatime.dt):
-                self.effects_after.pop(i)
-        [x.draw() for x in self.effects_after]
+                effects_list.pop(i)
+        [x.draw() for x in effects_list]
             
 
     def update_bloques_rects(self) -> None:
         self.bloques_rects.clear()
         for b in self.bloques:
-            if b['power'] == 0 and numpy.random.randint(0,10000) < 700:
-                b['power'] = numpy.random.randint(1,6)
-            else:
-                b['power'] = 0
             self.bloques_rects.append(b['rect'])
-
-    def load_lvl_to_DB(self,name) -> None:
-        self.cursor.execute("SELECT * FROM Bloques WHERE id_lvl=(SELECT id from Niveles WHERE nombre=?)",[name])
-        datos = self.cursor.fetchall()
-
-        for lvl,color, x, y, width, height, effect, border_radius, power in datos:
-            color = self.cursor.execute(f"SELECT red, green, blue FROM Colores WHERE id={color}")
-            color = [*color.fetchone()]
-            self.bloques.append({'rect': pag.Rect(int(x),int(y),int(width),int(height)), 'effect': effect, 'color': color, 'border_radius': border_radius,'power':power})
 
     def start(self, lvl: int) -> None:
 
         self.life = 3
-        self.score = 0
-        self.bugueado = 0
-        self.mulpliquer = 0
         self.life_text.change_text(f'Lives {self.life}')
         self.lvl_text.change_text(f'Nivel: {self.lvl}')
         self.score_text.change_text('Score 0')
         self.ball.set_pos((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7))
         self.ball.set_vel([0,-4])
         self.ball.update()
-        self.particles_ball.clear()
-        self.particles_ball.con = 0
         self.player.rect.topleft = (350,650)
-        self.limite_inferior.top = self.ventana_rect.height-15
 
         self.lvl_max = max(self.lvl, self.lvl_max)
         self.json["lvlLimit"] = max(self.json["lvlLimit"], self.lvl_max)
@@ -533,7 +509,6 @@ class BrickBricker(Botons_functions):
         self.fan_lvl_bool = False
         self.playing = False
         self.alive = True
-        self.win = False
 
         self.cubic_bezier_transitions.clear()
         self.reset()
@@ -573,46 +548,41 @@ class BrickBricker(Botons_functions):
                 for x in range(10):
                     self.bloques.append({'rect': pag.rect.Rect(62 * x + 80,50 * y + 100, 60, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         elif lvl == 4:
-            self.load_lvl_to_DB('espadaminecraft')
+            bloques = self.lvl_manager.search_lvl_blocks(2)
         elif lvl == 5:
-            self.load_lvl_to_DB('prueba2')
+            bloques = self.lvl_manager.search_lvl_blocks(3)
         elif lvl == 6:
-            self.load_lvl_to_DB('circulos')
+            bloques = self.lvl_manager.search_lvl_blocks(4)
         elif lvl == 7:
-            self.load_lvl_to_DB('paisaje1')
+            bloques = self.lvl_manager.search_lvl_blocks(7)
         elif lvl == 8:
-            self.load_lvl_to_DB('rosa')
+            bloques = self.lvl_manager.search_lvl_blocks(5)
         elif lvl == 9:
-            self.load_lvl_to_DB('interpolacion')
+            bloques = self.lvl_manager.search_lvl_blocks(6)
         else:
             color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
             for x in range(3,10):
                 self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * 6 + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
-
+        
+        if 10 > lvl > 3:
+            self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': b[8], 'color': (b[10],b[11],b[12])} for b in bloques]
+        
         self.update_bloques_rects()
 
-    def start_fan_lvl(self, lvl: str) -> None:
-
+    def start_fan_lvl(self) -> None:
         self.lvl = 1
         self.life = 3
-        self.score = 0
-        self.bugueado = 0
-        self.mulpliquer = 0
         self.life_text.change_text(f'Lives 3')
-        self.lvl_text.change_text(f'Nivel: {self.lvl_fan}')
+        self.lvl_text.change_text(f'Nivel: {self.lvl_fan_name}')
         self.score_text.change_text(f'Score 0')
         self.ball.set_pos((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7))
         self.ball.set_vel([0,-4])
         self.ball.update()
-        self.particles_ball.clear()
-        self.particles_ball.con = 0
         self.player.rect.topleft = (350,650)
-        self.limite_inferior.top = self.ventana_rect.height-15
 
         self.fan_lvl_bool = True
         self.alive = True
         self.playing = False
-        self.win = False
 
         self.powers.clear()
         self.cubic_bezier_transitions.clear()
@@ -620,19 +590,11 @@ class BrickBricker(Botons_functions):
         self.deltatime_ball.FPS = self.framerate_dificultad
         pag.time.set_timer(USEREVENT+1,500000000,1)
         pag.time.set_timer(USEREVENT+2,500000000,1)
-        self.ball.rapida = False
-        self.ball.lenta = False
+        self.reset()
 
         if self.bool_web_lvls:
-            self.cursor.execute("SELECT * FROM Niveles_2 WHERE nombre=?",[lvl])
-            loaded = self.cursor.fetchone()
-            
-            if not loaded:
-                self.guardar_nivel(self.lvl_fan,self.load_web_lvl(self.lvl_fan))
-            
-            self.bool_web_lvls = False
-            self.reload_list_for_fans_lvls()
-            # return self.start_fan_lvl(self.lvl_fan)
+            if  result := not self.lvl_manager.check_online_lvl(self.lvl_fan):
+                self.lvl_manager.guardar_nivel_online(self.load_web_lvl(self.lvl_fan))
 
 
             # Cargar los bloques 
@@ -642,57 +604,16 @@ class BrickBricker(Botons_functions):
         self.bloques.append({'rect': self.limite_izquierdo, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
         self.bloques.append({'rect': self.limite_superior, 'effect': 0, 'color': 'grey', 'border_radius': 0, 'power':0})
         self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':0})
-
-
-        self.cursor.execute("SELECT * FROM Bloques_2 WHERE id_lvl=(SELECT id from Niveles_2 WHERE nombre=?)",[lvl])
-        datos = self.cursor.fetchall()
-
-        for lvl,color, x, y, width, height, effect, border_radius, power in datos:
-            color = self.cursor.execute(f"SELECT red, green, blue FROM Colores WHERE id={color}")
-            color = [*color.fetchone()]
-            self.bloques.append({'rect': pag.Rect(int(x),int(y),int(width),int(height)), 'effect': effect, 'color': color, 'border_radius': border_radius,'power':power})
-
+        
+        if self.bool_web_lvls:
+            bloques = self.lvl_manager.search_web_lvl_blocks(self.lvl_fan)
+        else:
+            bloques = self.lvl_manager.search_custom_lvl_blocks(self.lvl_fan)
+        
+        self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': (numpy.random.randint(1,6) if b[8] == 0 and numpy.random.randint(0,10000) < 700 else b[8]), 'color': (b[10],b[11],b[12])} for b in bloques]
+        
         self.update_bloques_rects()
 
-    def guardar_nivel(self,name,bloques:list):
-        try:
-            self.cursor.execute('INSERT INTO Niveles_2 Values(NULL,?)',[name])
-            self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[name])
-            lvl_id = self.cursor.fetchone()[0]
-            for a in bloques:
-                datos = [
-                    lvl_id,
-                    self.match_color(a['color']),
-                    a['x'],
-                    a['y'],
-                    a['width'],
-                    a['height'],
-                    a['effect'],
-                    a['border_radius'],
-                    a.get('power',0)
-                ]
-                self.cursor.execute("INSERT INTO Bloques_2 VALUES(?,?,?,?,?,?,?,?,?)",datos)
-            self.base_de_datos.commit()
-        except sqlite3.IntegrityError:
-            messagebox(
-                "Error",
-                f"El nombre del perfil ya fue escogido",
-                info=False,
-                error=1,
-                buttons=("Ok",),
-                return_button=1,
-                escape_button=0,
-            )
-
-    def match_color(self,color: tuple[int,int,int], n=0) -> int:
-        if n > 3: return 1
-        r,g,b = color
-        self.cursor.execute("SELECT * FROM Colores WHERE red=? AND green=? AND blue=?",[r,g,b])
-        if result := self.cursor.fetchall():
-            return result[0][0]
-        self.cursor.execute("INSERT INTO Colores VALUES(NULL,?,?,?)",[r,g,b])
-        self.base_de_datos.commit()
-        return self.match_color(color,n+1)
 
     def eventos_en_comun(self, e) -> None:
         if not self.low_detail_mode: self.background.draw()
@@ -716,48 +637,6 @@ class BrickBricker(Botons_functions):
             p = self.music_var.change()
             self.text_song.change_text(p['text'])
             self.lista_cosa.select(p['index'])
-
-    def reload_list_for_fans_lvls(self) -> None:
-        self.cursor.execute("SELECT * FROM Niveles_2")
-        niveles = self.cursor.fetchall()
-        niveles.sort()
-        
-        self.lista_fans_lvls.change_list(niveles)
-
-    def delete_table_in_list_for_fans_lvls(self) -> None:
-        if self.lvl_fan == '' or self.lvl_fan == None or self.lvl_fan == False:
-            return False
-        self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[self.lvl_fan])
-        su_id = self.cursor.fetchone()[0]
-
-        try:
-            self.cursor.execute("DELETE FROM Niveles_2 WHERE nombre=?",[self.lvl_fan])
-        except Exception as e:
-            messagebox(
-                "Error",
-                f"A ocurrido un error al eliminar el nivel\n{e}",
-                info=False,
-                error=1,
-                buttons=("Ok",),
-                return_button=1,
-                escape_button=1,
-            )
-        try:
-            self.cursor.execute("DELETE FROM Bloques_2 WHERE id_lvl=?",[su_id])
-        except Exception as e:
-            messagebox(
-                "Error",
-                f"A ocurrido un error al eliminar la tabla del nivel\n{e}",
-                info=False,
-                error=1,
-                buttons=("Ok",),
-                return_button=1,
-                escape_button=1,
-            )
-        self.lvl_fan = ''
-        self.base_de_datos.commit()
-        self.reload_list_for_fans_lvls()
-
 
     def appli_powerup(self, type) -> None:
         if type == 1:
@@ -794,10 +673,17 @@ class BrickBricker(Botons_functions):
                 self.effects_after.append(Effect(4,(0,0),self.ventana,self.ventana_rect.size))
 
     def reset(self) -> None:
+        self.score = 0
+        self.mulpliquer = 0
+        self.bugueado = 0
         self.powers.clear()
+        self.particles_ball.clear()
+        self.particles_ball.con = 0
         self.float_texts_list.clear()
         self.deltatime.FPS = self.framerate_dificultad
         self.deltatime_ball.FPS = self.framerate_dificultad
+        self.limite_inferior.top = self.ventana_rect.height-15
+
         for i,tra in sorted(enumerate(self.cubic_bezier_transitions),reverse= True):
             if tra['afectado'] == 'ball':
                 self.cubic_bezier_transitions.pop(i)
@@ -807,7 +693,9 @@ class BrickBricker(Botons_functions):
         self.ball.lenta = False
         self.ball.explocion = False
 
-    def loss(self) -> bool:
+        self.win = False
+
+    def check_loss(self) -> bool:
         if self.life <= 0 and self.alive == True:
             self.alive = False
             self.sounds.loss.play()
@@ -859,6 +747,10 @@ class BrickBricker(Botons_functions):
                         self.sounds.boton1.play()
                         self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.3))
                         self.bool_title_extras = False
+                    elif self.social_media_github_button.rect.collidepoint(eventos.pos):
+                        self.social_media_github_button.click()
+                    elif self.social_media_youtube_button.rect.collidepoint(eventos.pos):
+                        self.social_media_youtube_button.click()
 
             self.extras_nombre.draw(self.ventana)
             if not self.low_detail_mode:
@@ -866,6 +758,8 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.draw()
             self.salir_text_title.draw(self.ventana)
             self.extras_version.draw(self.ventana)
+            self.social_media_github_button.draw(self.ventana)
+            self.social_media_youtube_button.draw(self.ventana)
 
             pag.display.flip()
             self.relog.tick(60)
@@ -880,23 +774,17 @@ class BrickBricker(Botons_functions):
                 if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
                     if self.lista_fans_lvls.rect.collidepoint(eventos.pos):
                         if p := self.lista_fans_lvls.select():
-                            self.lvl_fan = p[1]
-                    if self.pausa_text_X.rect.collidepoint(eventos.pos):
+                            self.lvl_fan = p[0]
+                            self.lvl_fan_name = p[1]
+                    elif self.lista_web_lvls.rect.collidepoint(eventos.pos):
+                        if p := self.lista_web_lvls.select():
+                            self.lvl_fan = p[0]
+                            self.lvl_fan_name = p[1]
+                    elif self.pausa_text_X.rect.collidepoint(eventos.pos):
                         self.title_fan_lvls_bool = False
-                    if self.boton_seleccionar.rect.collidepoint(eventos.pos):
-                        if self.bool_web_lvls:
-                            # self.hilos.submit(self.load_web_lvl,self.lvl_fan)
-                            self.start_fan_lvl(self.lvl_fan)
-                        elif self.lvl_fan:
-                            self.title_screen = False
-                            self.title_fan_lvls_bool = False
-                            self.start_fan_lvl(self.lvl_fan)
-                    if self.boton_web_lvls.rect.collidepoint(eventos.pos):
-                        self.boton_web_lvls.click()
-                    if self.boton_borrar.rect.collidepoint(eventos.pos):
-                        self.bool_title_confirm = True
-                        if self.title_confirm():
-                            self.delete_table_in_list_for_fans_lvls()
+                    for b in self.botones_custom_lvls_list:
+                        if b.rect.collidepoint(eventos.pos):
+                            b.click()
                 elif eventos.type == MOUSEWHEEL and self.lista_fans_lvls.rect.collidepoint(pag.mouse.get_pos()):
                     self.lista_fans_lvls.rodar(eventos.y * 15)
 
@@ -907,13 +795,13 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.update()
 
             self.pausa_text_X.draw(self.ventana)
-            self.text_created_lvls.draw(self.ventana)
             self.lista_fans_lvls.draw(self.ventana)
-            self.boton_borrar.draw(self.ventana)
-            self.boton_seleccionar.draw(self.ventana)
-            self.text_buscando_niveles.draw(self.ventana)
+            self.lista_web_lvls.draw(self.ventana)
 
-            self.boton_web_lvls.draw(self.ventana)
+            for b in self.botones_custom_lvls_list:
+                b.draw(self.ventana)
+            for b in self.texts_lvls_fans_list:
+                b.draw(self.ventana)
             
 
             pag.display.flip()
@@ -1068,7 +956,7 @@ class BrickBricker(Botons_functions):
                 else:
                     pag.mixer_music.unpause()
 
-            self.draw_effects_before()
+            self.draw_effects(self.effects_before)
 
             [pag.draw.rect(self.ventana, alala['color'], alala['rect'], border_radius= alala['border_radius']) for alala in self.bloques]
 
@@ -1077,7 +965,10 @@ class BrickBricker(Botons_functions):
                 self.ball.draw()
                 self.particles_ball.draw()
 
-            self.draw_effects_after()
+            for i,p in sorted(enumerate(self.powers),reverse= True):
+                p.draw()
+
+            self.draw_effects(self.effects_after)
 
             for i,text in sorted(enumerate(self.float_texts_list),reverse= True):
                 if text.update():
@@ -1141,7 +1032,7 @@ class BrickBricker(Botons_functions):
                 elif eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
                     if self.boton_game_over.rect.collidepoint(eventos.pos) and not self.alive:
                         if not self.fan_lvl_bool:self.start(self.lvl)
-                        else: self.start_fan_lvl(self.lvl_fan)
+                        else: self.start_fan_lvl()
                     if self.boton_win.rect.collidepoint(eventos.pos) and self.win:
                         if not self.fan_lvl_bool:
                             try:
@@ -1163,27 +1054,18 @@ class BrickBricker(Botons_functions):
                             
 
             # -------------------------------------------------------  Logica   ------------------------------------------
-            self.loss()
+            self.check_loss()
 
-            if len(self.bloques) == 6 and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 170:
-                angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)/360
-                angulo2 = Angulo((0,0),self.ball.vel)/360
-                if 0<numpy.abs(angulo1-angulo2)<.3 or Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 170:
-                    if not self.acercandose and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 100:
-                        self.acercandose = True
-                        self.sounds.casi.play()
-                    self.deltatime_ball.FPS = max(10,(Hipotenuza(self.ball.rect.center,self.bloques[-1]['rect'].center)/170)*self.framerate_dificultad)
-                else:
-                    if self.acercandose:
-                        self.acercandose = False
-                        if len(self.bloques) == 6:
-                            self.sounds.casi.stop()
-                            self.sounds.decepcion.play()
-                    self.acercandose = False
-                    self.deltatime_ball.FPS = self.framerate_dificultad
-
-            elif not self.ball.lenta and not self.ball.rapida:
+            if len(self.bloques) > 6 and not self.ball.lenta and not self.ball.rapida:
                 self.deltatime_ball.FPS = self.framerate_dificultad
+            elif (distancia := Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center)) < 170:
+                self.deltatime_ball.FPS = max(10,(distancia/170)*self.framerate_dificultad)
+                if distancia < 80 and not self.acercandose:
+                    self.sounds.casi.play()
+                    self.acercandose = True
+            elif self.acercandose:
+                self.acercandose = False
+
                 
             for i,tra in sorted(enumerate(self.cubic_bezier_transitions),reverse= True):
                 vec = tra['transition'].update()
@@ -1202,14 +1084,14 @@ class BrickBricker(Botons_functions):
             if not self.win and self.alive and self.playing:
                 self.bugueado += 1
             if self.bugueado > 10*self.framerate_general:
-                self.ball.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.7)
-                self.ball.vel = [0,-4]
+                self.ball.set_pos((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7))
+                self.ball.set_vel([0,-4])
                 self.playing = False
 
 
                         # -----------------------------------Dibujar --------------------------------------
 
-            self.draw_effects_before()
+            self.draw_effects(self.effects_before)
 
             if not self.low_detail_mode:
                 self.particles_ball.update(self.ball.pos)
@@ -1224,8 +1106,8 @@ class BrickBricker(Botons_functions):
 
             if self.ball.rect.left>self.ventana_rect.w or self.ball.rect.top>self.ventana_rect.h or self.ball.rect.right<0 or self.ball.rect.bottom<0:
                 self.bugueado = 0
-                self.a_reiniciar.draw()
-                self.a_reiniciar2.draw()
+                self.a_reiniciar.draw(self.ventana)
+                self.a_reiniciar2.draw(self.ventana)
 
             if len(self.bloques) == 5:
                 if not self.win:
@@ -1257,9 +1139,6 @@ class BrickBricker(Botons_functions):
                 if not spark.alive:
                     self.sparks.pop(i)
 
-            self.draw_effects_after()
-
-
             for i,p in sorted(enumerate(self.powers),reverse= True):
                 p.move(self.deltatime.dt)
                 p_c = p.colicion(self.bloques_rects[:5])
@@ -1269,6 +1148,8 @@ class BrickBricker(Botons_functions):
                     self.appli_powerup(p.type)
                     self.powers.pop(i)
                 p.draw()
+                
+            self.draw_effects(self.effects_after)
 
 
             for i,text in sorted(enumerate(self.float_texts_list),reverse= True):

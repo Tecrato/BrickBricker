@@ -1,19 +1,20 @@
-import pygame as pag, sys, sqlite3,os
-from pygame._sdl2 import messagebox
+import pygame as pag, sys
+from os import mkdir, path
 from pygame.locals import *
 from platformdirs import *
 
-appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
-try:
-    os.mkdir('/'.join(appdata.split('\\')[:-1]))
-except:
-    pass
-try:
-    os.mkdir(appdata)
-except:
-    pass
+from lvl_manager import Lvl_manager
 
 from Utilidades import *
+
+
+appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
+
+if not path.isdir('/'.join(appdata.split('\\')[:-1])):
+    mkdir('/'.join(appdata.split('\\')[:-1]))
+if not path.isdir(appdata):
+    mkdir(appdata)
+
 
 # que borre el ultimo cambio (es fliparse ya)
  
@@ -44,6 +45,9 @@ class lvl_creator_for_BrickBricker:
         self.color = (0,0,0)
         self.relog = pag.time.Clock()
 
+        # El manejador de los niveles
+        self.lvl_manager: Lvl_manager = Lvl_manager(appdata+'/'+'lvls.sqlite3')
+
         # Fuentes
         self.fuente_simbolos= 'Assets/Fuentes/Symbols.ttf'
         self.fuente_orbi_medium= 'Assets/Fuentes/Orbitron-Medium.ttf'
@@ -56,17 +60,17 @@ class lvl_creator_for_BrickBricker:
         self.limite_derecho = pag.rect.Rect(self.ventana_rect.width-20, 0, 20, self.ventana_rect.height)
         self.limite_izquierdo = pag.rect.Rect(0, 0, 20, self.ventana_rect.height)
 
-        #Botones 
-        self.text_boton1 = Create_text('1', 30, self.fuente_orbi_medium, (50,45),'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton2 = Create_text('2', 30, self.fuente_orbi_medium, (100,45), 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton3 = Create_text('3', 30, self.fuente_orbi_medium, (150,45), 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton4 = Create_text('4', 30, self.fuente_orbi_medium, (200,45), 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton5 = Create_text('5', 30, self.fuente_orbi_medium, (250,45), 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton_b = Create_text('B', 30, self.fuente_orbi_medium, (50,100), 'center', 'black', True, color_rect='white', border_radius=10000)
-        self.text_boton_borrar = Create_text('', 30, self.fuente_simbolos, (50,160), 'center', 'black', True, 'white', border_radius=40)
-        self.text_boton_borrar_dis = Create_text(self.distancia_borrando, 20, self.fuente_orbi_medium, (50,200), 'center', 'white')
-        self.text_boton_color_capture = Create_text('Capturar color', 30, self.fuente_orbi_medium, (300,45), 'left', 'black', True, 'white', border_radius=40)
-        self.text_boton_guardar = Create_text('', 30, self.fuente_simbolos, (730,45), 'left', 'black', True, 'white', border_radius=40)
+        #Botones
+        self.boton_mode1 = Create_boton('1', 30, self.fuente_orbi_medium, (50,45), 20,'center', 'black', 'white', border_radius=10_000, func=lambda: self.start(1))
+        self.boton_mode2 = Create_boton('2', 30, self.fuente_orbi_medium, (100,45), 20, 'center', 'black', 'white', border_radius=10_000, func=lambda: self.start(2))
+        self.boton_mode3 = Create_boton('3', 30, self.fuente_orbi_medium, (150,45), 20, 'center', 'black', 'white', border_radius=10_000, func=lambda: self.start(3))
+        self.boton_mode4 = Create_boton('4', 30, self.fuente_orbi_medium, (200,45), 20, 'center', 'black', 'white', border_radius=10_000, func=lambda: self.start(4))
+        self.boton_mode5 = Create_boton('5', 30, self.fuente_orbi_medium, (250,45), 20, 'center', 'black', 'white', border_radius=10_000, func=lambda: self.start(5))
+        self.boton_border_radius = Create_boton('B', 30, self.fuente_orbi_medium, (50,100), 20, 'center', 'black', 'white', border_radius=10_000, func=self.func_border_radius)
+        self.boton_borrar = Create_boton('', 30, self.fuente_simbolos, (50,160), 20, 'center', 'black', 'white', border_radius=40, func=self.func_borrar)
+        self.text_boton_borrar_distance = Create_text(self.distancia_borrando, 20, self.fuente_orbi_medium, (50,200), 'center', 'white')
+        self.boton_color_capture = Create_boton('Capturar color', 30, self.fuente_orbi_medium, (300,45), 20, 'left', 'black', 'white', border_radius=40, func=self.func_color_capture)
+        self.boton_guardar = Create_boton('', 30, self.fuente_simbolos, (730,45), 20, 'left', 'black', 'white', border_radius=40, func=self.func_guardar)
 
         self.boton_back_U = Create_text('', 20, self.fuente_simbolos, (30,260), 'center', 'white', padding=5)
         self.boton_next_U = Create_text('', 20, self.fuente_simbolos, (60,260), 'center', 'white', padding=5)
@@ -78,7 +82,7 @@ class lvl_creator_for_BrickBricker:
         self.bp_5 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'white')
         self.bp_6 = Create_text('', 30, self.fuente_simbolos, (-45,300), 'center', 'white')
         self.bp_0 = Create_text('X', 30, self.fuente_mononoki, (-45,300), 'center', 'red')
-        self.bp_s = Create_text('select', 18, self.fuente_orbi_medium, (45,340), 'center', 'black', True, color_rect='white',padding=10, border_radius=10)
+        self.boton_select_power = Create_boton('select', 18, self.fuente_orbi_medium, (40,340), 10, 'center', 'black', color_rect='white', border_radius=10, func=self.func_select_power)
 
         #Input text
         self.text_title_guardar = Create_text('Paso final', 25, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (self.ventana_rect.centerx,self.ventana_rect.centery-70), 'center', 'black')
@@ -100,10 +104,15 @@ class lvl_creator_for_BrickBricker:
         self.barra3 = Barra_de_progreso((750,650), 150)
         self.barra3_status = False
 
-        self.text_list = [self.text_boton1,self.text_boton2,self.text_boton3,self.text_boton4,self.text_boton5,self.text_boton_b,
-        self.text_boton_borrar,self.text_boton_borrar_dis,self.text_boton_color_capture,self.text_boton_guardar,self.barra1,self.barra2,
-        self.barra3, self.boton_next_U, self.boton_back_U, self.bp_1, self.bp_2, self.bp_3, self.bp_4, self.bp_5, self.bp_6,self.bp_s,
-        self.bp_x, self.bp_0]
+        self.draw_list = [self.boton_mode1,self.boton_mode2,self.boton_mode3,self.boton_mode4,self.boton_mode5,self.boton_border_radius,
+        self.boton_borrar,self.text_boton_borrar_distance,self.boton_color_capture,self.boton_guardar,self.barra1,self.barra2,
+        self.barra3, self.boton_next_U, self.boton_back_U, self.bp_1, self.bp_2, self.bp_3, self.bp_4, self.bp_5, self.bp_6,
+        self.boton_select_power,self.bp_x, self.bp_0]
+
+        self.to_function_list = [
+            self.boton_mode1,self.boton_mode2,self.boton_mode3,self.boton_mode4,self.boton_mode5,self.boton_border_radius,
+            self.boton_borrar,self.boton_color_capture,self.boton_guardar,self.boton_select_power,
+        ]
         
         self.powers = [self.bp_x,self.bp_1, self.bp_2, self.bp_3, self.bp_4, self.bp_5, self.bp_6,self.bp_0]
         for x in self.powers:
@@ -115,14 +124,6 @@ class lvl_creator_for_BrickBricker:
         for y in range(7): # 5
             for x in range(13): # 10
                 self.bloques_colores.append({'rect': pag.rect.Rect(21 * x + 80,21 * y + 500, 20, 20), 'color': (125,125,125)})
-
-        # self.the_colors=[
-        #     (0,0,139),(0,255,0),(255,0,0),(135,206,255),(128,50,0),(255,255,0),(255,0,255),(255,128,0),(50,205,20),(0,0,0),
-        #     (0,0,255),(70,0,180),(255,127,80),(175,48,96),(240,230,140),(75,0,130),(124,252,0),(173,216,230),(154,205,50),(50,50,50),
-        #     (0,139,139),(128,128,0),(205,133,63),(255,165,0),(139,37,0),(218,112,214),(152,251,152),(238,232,170),(219,112,147),(100,100,100),
-        #     (102,205,170),(255,192,203),(221,160,221),(250,128,114),(139,69,19),(46,139,87),(255,245,238),(160,82,45),(192,192,192),(127,127,127),
-        #     (65,224,208),(70,130,180),(106,90,205),(210,180,140),(216,191,216),(255,99,71),(238,130,238),(208,32,144),(254,222,179),(211,211,211),
-        #     (0,255,255),(255,218,185),(255,255,255)]
 
         self.the_colors = [(0,0,139),(0,255,0),(255,0,0),(135,206,255),(128,50,0),(255,255,0),(255,0,255),(255,128,0),(50,205,20),(0,0,0),
         (0,0,255),(70,0,180),(255,127,80),(175,48,96),(240,230,140),(75,0,130),(124,252,0),(173,216,230),(154,205,50),(50,50,50),(0,139,139),
@@ -142,13 +143,33 @@ class lvl_creator_for_BrickBricker:
         #Nose algo
         self.text_num = [Create_text(f'{n}', 20, self.fuente_orbi_medium, (-100,-100),'center') for n in range(10)]
 
-        #Crear base de datos
-        self.Base_de_datos = sqlite3.connect(appdata+'/'+'lvls.sqlite3')
-        self.cursor = self.Base_de_datos.cursor()
 
         self.start(4)
         self.Main_Process()
 
+    def func_border_radius(self) -> None:
+        self.mucho_border_radius = not self.mucho_border_radius
+        self.boton_border_radius.change_color_ad('green' if self.mucho_border_radius == True else 'black')
+    def func_borrar(self) -> None:
+        self.brocha = not self.brocha
+        if self.brocha: self.boton_borrar.change_color_ad('green')
+        else: self.boton_borrar.change_color_ad('black')
+    def func_color_capture(self) -> None:
+        if self.capturando_color:
+            self.boton_color_capture.change_color_ad('black')
+            self.capturando_color = False
+        else:
+            self.boton_color_capture.change_color_ad('green')
+            self.capturando_color = True
+    def func_guardar(self) -> None:
+        self.bool_title_guardar = True
+        self.title_guardar()
+    def func_select_power(self) -> None:
+        self.colocando_power = not self.colocando_power
+        if self.colocando_power:
+            self.boton_select_power.change_color_ad('green')
+        else:
+            self.boton_select_power.change_color_ad('black')
         
     def update_bloques_rects(self) -> None:
         self.bloques_rects.clear()
@@ -180,7 +201,7 @@ class lvl_creator_for_BrickBricker:
             for y in range(len(lvl_map)):
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 1:
-                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
+                        self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':0})
 
         if mode == 2:
             # lvl_map = []
@@ -210,86 +231,32 @@ class lvl_creator_for_BrickBricker:
             for y in range(len(lvl_map)):
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 1:
-                        self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
+                        self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':0})
 
         elif mode == 3:
             self.mucho_border_radius = True
             for y in range(16):
                 for x in range(29):
-                    self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(22 * x + 80,22 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':0})
             
         elif mode == 4:
             self.mucho_border_radius = False
             for y in range(18):
                 for x in range(32):
-                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 0, 'power':0})
             
         elif mode == 5:
             self.mucho_border_radius = True
             for y in range(18):
                 for x in range(32):
-                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':None})
+                    self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':0})
             
-        self.text_boton_b.change_color('green' if self.mucho_border_radius == True else 'black')
+        self.boton_border_radius.change_color('green' if self.mucho_border_radius == True else 'black')
 
                     
         self.update_bloques_rects()
 
-    def match_color(self,color: tuple[int,int,int], n=0) -> None:
-        if n > 3: return 1
-        r,g,b = color
-        self.cursor.execute("SELECT * FROM Colores WHERE red=? AND green=? AND blue=?",[r,g,b])
-        if result := self.cursor.fetchall():
-            return result[0][0]
-        else:
-            self.cursor.execute(f"INSERT INTO Colores VALUES(NULL,?,?,?)",[r,g,b])
-            self.base_de_datos.commit()
-        return self.match_color(color,n+1)
-    
-    def Guardar(self) -> None:
-        nombre = self.input_nombre.get_text()
-        if nombre != '' and len(nombre) > 2:
-            try:
-                self.cursor.execute('INSERT INTO Niveles_2 Values(NULL,?)',[nombre])
-                self.cursor.execute('SELECT * FROM Niveles_2 WHERE nombre=?',[nombre])
-                lvl_id = self.cursor.fetchone()[0]
-                for a in self.bloques:
-                    if a['active']:
-                        datos = [
-                            lvl_id,
-                            self.match_color(a['color']),
-                            a['rect'].left,
-                            a['rect'].top,
-                            a['rect'].width,
-                            a['rect'].height,
-                            a['effect'],
-                            a['border_radius'],
-                            a.get('power',0)
-                        ]
-                        self.cursor.execute("INSERT INTO Bloques_2 VALUES(?,?,?,?,?,?,?,?,?)",datos)
-                self.Base_de_datos.commit()
-            except sqlite3.IntegrityError:
-                messagebox(
-                    "Error",
-                    f"El nombre del perfil ya fue escogido",
-                    info=False,
-                    error=1,
-                    buttons=("Ok",),
-                    return_button=1,
-                    escape_button=0,
-                )
-        else:
-            messagebox(
-                "Error",
-                "Nombre invalido",
-                warn=True,
-                error=1,
-                buttons=("Ok",),
-                return_button=1,
-                escape_button=1,
-            )
-
-    def title_guardar(self):
+    def title_guardar(self) -> None:
         self.input_nombre.typing = True
         while self.bool_title_guardar:
             self.ventana.fill('black')
@@ -298,8 +265,9 @@ class lvl_creator_for_BrickBricker:
             eventos = pag.event.get()
             #Para el input
             for en in self.all_inputs:
-                if resultado := en.eventos_teclado(eventos) == "enter" and self.all_inputs[0].get_text():
-                    self.Guardar()
+                if en.eventos_teclado(eventos) == "enter" and (resultado := self.all_inputs[0].get_text()):
+                    lista  = list(filter(lambda x: x['active'],self.bloques))
+                    self.lvl_manager.guardar_nivel(resultado, lista)
                     self.bool_title_guardar = False
                     break
             #Fin del input
@@ -334,7 +302,7 @@ class lvl_creator_for_BrickBricker:
                 if eventos.type == pag.QUIT:
                     pag.quit()
                     sys.exit()
-                if eventos.type == pag.KEYDOWN:
+                elif eventos.type == pag.KEYDOWN:
                     if eventos.key == K_ESCAPE:
                         pag.quit()
                         sys.exit()
@@ -345,15 +313,15 @@ class lvl_creator_for_BrickBricker:
                         self.title_guardar()
                     elif eventos.key == K_SPACE:
                         self.capturando_color = True
-                        self.text_boton_color_capture.change_color('green')
-                if eventos.type == MOUSEWHEEL and self.brocha:
+                        self.boton_color_capture.change_color_ad('green')
+                elif eventos.type == MOUSEWHEEL and self.brocha:
                     self.distancia_borrando += eventos.y
-                    self.text_boton_borrar_dis.change_text(f'{self.distancia_borrando}')
-                if eventos.type == MOUSEBUTTONDOWN and eventos.button == 3:
-                        self.text_boton_color_capture.change_color('green')
+                    self.text_boton_borrar_distance.change_text(f'{self.distancia_borrando}')
+                elif eventos.type == MOUSEBUTTONDOWN and eventos.button == 3:
+                        self.boton_color_capture.change_color_ad('green')
                         self.capturando_color = True
                 elif eventos.type == MOUSEBUTTONUP and eventos.button == 3:
-                        self.text_boton_color_capture.change_color('black')
+                        self.boton_color_capture.change_color_ad('black')
                         self.capturando_color = False
                 elif eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
                     self.click = True
@@ -363,24 +331,12 @@ class lvl_creator_for_BrickBricker:
                             self.barra1.set_volumen(x['color'][0] / 255)
                             self.barra2.set_volumen(x['color'][1] / 255)
                             self.barra3.set_volumen(x['color'][2] / 255)
-                    if self.capturando_color:
-                        self.capturando_color = False
                     if self.barra1.rect2.collidepoint(eventos.pos):
                         self.barra1_status = True
                     elif self.barra2.rect2.collidepoint(eventos.pos):
                         self.barra2_status = True
                     elif self.barra3.rect2.collidepoint(eventos.pos):
                         self.barra3_status = True
-                    elif self.text_boton1.rect.collidepoint(eventos.pos):
-                        self.start(1)
-                    elif self.text_boton2.rect.collidepoint(eventos.pos):
-                        self.start(2)
-                    elif self.text_boton3.rect.collidepoint(eventos.pos):
-                        self.start(3)
-                    elif self.text_boton4.rect.collidepoint(eventos.pos):
-                        self.start(4)
-                    elif self.text_boton5.rect.collidepoint(eventos.pos):
-                        self.start(5)
                     elif self.boton_next_U.rect.collidepoint(eventos.pos):
                         self.upgrade_selected += 1
                         if self.upgrade_selected > 7:
@@ -395,28 +351,13 @@ class lvl_creator_for_BrickBricker:
                         for x in self.powers:
                             x.move((-45,300))
                         self.powers[self.upgrade_selected].move((45,300))
-                    elif self.bp_s.rect.collidepoint(eventos.pos):
-                        self.colocando_power = not self.colocando_power
-                        if self.colocando_power:
-                            self.bp_s.change_color('green')
-                        else:
-                            self.bp_s.change_color('black')
-                    elif self.text_boton_guardar.rect.collidepoint(eventos.pos):
-                        self.bool_title_guardar = True
-                        self.title_guardar()
-                    elif self.text_boton_b.rect.collidepoint(eventos.pos):
-                        self.mucho_border_radius = not self.mucho_border_radius
-                        self.text_boton_b.change_color('green' if self.mucho_border_radius == True else 'black')
-                    elif self.text_boton_color_capture.rect.collidepoint(eventos.pos) and not self.brocha:
-                        self.text_boton_color_capture.change_color('green')
-                        self.capturando_color = True
-                    elif self.text_boton_borrar.rect.collidepoint(eventos.pos):
-                        
-                        self.brocha = not self.brocha
-                        if self.brocha: self.text_boton_borrar.change_color('green')
-                        else: self.text_boton_borrar.change_color('black')
+                    for x in self.to_function_list:
+                        if x.rect.collidepoint(eventos.pos):
+                            x.click()
+                            break
                     else:
-                        self.text_boton_color_capture.change_color('black')
+                        self.boton_color_capture.change_color_ad('black')
+                        self.capturando_color = False
                         self.cambiando = True
                 elif eventos.type == MOUSEBUTTONUP and eventos.button == 1:
                     self.click = False
@@ -431,7 +372,7 @@ class lvl_creator_for_BrickBricker:
             # Se dibujan los bloques
             for alala in self.bloques:
                 pag.draw.rect(self.ventana, alala['color'], alala['rect'], border_radius=alala['border_radius'])
-                if alala['power'] != None:
+                if alala['power'] != 0:
                     if alala['color'] == 'black' or ((alala['color'][0] + alala['color'][1] + alala['color'][2]) / (255*3) < .4):
                         color = 'white'
                     else:
@@ -446,7 +387,7 @@ class lvl_creator_for_BrickBricker:
             [pag.draw.rect(self.ventana, alala['color'], alala['rect']) for alala in self.bloques_colores]
                 
             # Se dibujan los textos
-            [cosa.draw(self.ventana) for cosa in self.text_list]
+            [cosa.draw(self.ventana) for cosa in self.draw_list]
 
             # logica del ...
             if self.capturando_color:
@@ -472,7 +413,7 @@ class lvl_creator_for_BrickBricker:
                         if self.upgrade_selected != 0:
                             blabla['power'] = self.upgrade_selected
                         else:
-                            blabla['power'] = None
+                            blabla['power'] = 0
 
             elif self.cambiando:
                 if self.brocha:

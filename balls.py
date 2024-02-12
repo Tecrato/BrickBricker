@@ -1,12 +1,12 @@
-import numpy
-from pygame import image, transform, rect
+from pygame import image, transform, rect, Vector2
+from Utilidades import Hipotenuza
 class Ball:
     def __init__(self, pos: tuple, size: int, surface, vel: list) -> None:
         self.image = transform.scale((image.load('Assets/images/pelota.png')), (size,size))
-        self.pos = numpy.array(pos)
+        self.pos = Vector2(pos)
         self.rect = rect.Rect(pos[0], pos[1], size, size)
         self.surface = surface
-        self.vel = numpy.array(vel)
+        self.vel = Vector2(vel)
         self.explocion = False
         self.lenta = False
         self.rapida = False
@@ -23,6 +23,20 @@ class Ball:
         self.surface.blit(self.image, self.rect)
 
     def set_vel(self,vel) -> None:
-        self.vel = numpy.array(vel)
+        self.vel = Vector2(vel)
     def set_pos(self,pos) -> None:
-        self.pos = numpy.array(pos)
+        self.pos = Vector2(pos)
+
+    def check_colision(self,bloques, dt=1):
+        choque = self.rect.collidelistall(bloques)
+        if len(choque) == 0:
+            return -1
+        elif len(choque) == 1:
+            while self.rect.collidelist(bloques) != -1:
+                self.retroceder(.1)
+            while self.rect.collidelist(bloques) == -1:
+                self.update(.1)
+            return self.rect.collidelist(bloques)
+        elif len(choque) > 1:
+            self.retroceder(dt)
+            return sorted(choque,key=lambda num:Hipotenuza(self.rect.center,bloques[num].center))[0]

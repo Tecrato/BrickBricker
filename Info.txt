@@ -4,10 +4,45 @@ trayecto 1-2? universidad
 
 semana santa
 
-mucha modulacion
+
+separar el inicio de niveles custom y web en 2, y normalizar todo en lo que se parezca
 
 slow motion al romper un bloque
 
 hacer que la pantalla de carga tenga engranajes mientras inicia el juego (carga tan rapido que no vale la pena)
 
-Hacer una clase que maneje los niveles (Guardarlos, cargarlos, descargarlos, eliminarlos, y lo que se me ocurra)
+Hacer que cuando se le da al boton de niveles web, se mueva la lista para dar espacio a otra lista que es la que si tendra los niveles de internet
+
+Usar _ para cuando declaro algo que no use, como en un for que no necesito la variable del for
+
+# --------------------
+for item in items:
+	if item:
+		print('Algo pas�')
+		break
+else:
+	print("No sucedi� nada raro en el for")
+
+# --------------------------------------
+def f(x):
+	return x-1
+
+results_walrus = [result for x in range(10) if (result := f(x)) > 3]
+
+# ------------------------------------------
+Quad-Tree
+
+
+# angulo1 = Angulo(self.ball.rect.center,self.bloques[-1]['rect'].center)/360
+# angulo2 = Angulo((0,0),self.ball.vel)/360
+# if 0 < numpy.abs(angulo1-angulo2) < .3 or distancia < 170:
+	# if not self.acercandose and Hipotenuza(self.bloques[-1]['rect'].center, self.ball.rect.center) < 100:
+	#     self.acercandose = True
+	#     self.sounds.casi.play()
+	#     self.sounds.decepcion.stop()
+	# if self.acercandose:
+	#     self.acercandose = False
+	#     if len(self.bloques) == 6:
+	#         self.sounds.casi.stop()
+	#         self.sounds.decepcion.play()
+	# self.acercandose = False

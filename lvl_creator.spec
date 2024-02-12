@@ -37,13 +37,12 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='lvl_c.ico',
 )
 build_options = {
     'build': {
-#         'force_32bit': True,  # Compilar para 32 bits
         'optimize': 2,  # Nivel de optimización
         'include_msvcr': True,  # Incluir MSVCR
-#         'disable_python_cache': True,  # Deshabilitar caché de Python
         'preload': ['numpy'],  # Precargar librerías (en este caso, numpy)
         'zip_include_packages': '*',  # Incluir todos los paquetes en el archivo zip
         'pycache_prefix': 'p',  # Prefijo para los archivos de caché
