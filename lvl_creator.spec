@@ -8,7 +8,9 @@ a = Analysis(
     ['lvl_creator.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('./lvl_c.ico','./'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
