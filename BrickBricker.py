@@ -223,7 +223,7 @@ class BrickBricker(Botons_functions):
 
                                                 # Del menu de extras
         self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
-        self.extras_version = Create_text('Version 1.7',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
+        self.extras_version = Create_text('Version 1.7.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
         self.social_media_github_button = Create_boton('',30,self.fuente_simbolos, (10,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://github.com/Tecrato'))
         self.social_media_youtube_button = Create_boton('輸',30,self.fuente_simbolos, (70,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://youtube.com/channel/UCeMfUcvDXDw2TPh-b7UO1Rw'))
 
@@ -484,7 +484,6 @@ class BrickBricker(Botons_functions):
                 effects_list.pop(i)
         [x.draw() for x in effects_list]
             
-
     def update_bloques_rects(self) -> None:
         self.bloques_rects.clear()
         for b in self.bloques:

@@ -171,8 +171,6 @@ class Botons_functions:
         except Exception as err:
             print(err)
             self.text_buscando_niveles.change_text('Verifique su conexion a internet')
-            self.lista_fans_lvls.move_rel((self.ventana_rect.width, 0))
-            self.lista_web_lvls.move_rel((self.ventana_rect.width, 0))
         finally:
             self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
             self.text_buscando_niveles.move(pag.Vector2(self.ventana_rect.center) - (0,self.ventana_rect.height))
