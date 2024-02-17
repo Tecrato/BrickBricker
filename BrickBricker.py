@@ -342,8 +342,8 @@ class BrickBricker(Botons_functions):
             self.boton_reanudar.move((self.ventana_rect.centerx,self.ventana_rect.centery * .85))
 
         # Para los scores
-        self.json.setdefault("lvl_scores",{})
-        self.json.setdefault("fan_lvl_scores",{})
+        # self.json.setdefault("lvl_scores",{})
+        # self.json.setdefault("fan_lvl_scores",{})
 
         # Para el "Aleatorio" en la musica
         self.json.setdefault("music_random",True)
@@ -1034,19 +1034,19 @@ class BrickBricker(Botons_functions):
                         else: self.start_fan_lvl()
                     if self.boton_win.rect.collidepoint(eventos.pos) and self.win:
                         if not self.fan_lvl_bool:
-                            try:
-                                self.json["lvl_scores"][f"lvl_{self.lvl}_score"]
-                            except:
-                                self.json["lvl_scores"][f"lvl_{self.lvl}_score"] = 0
-                            self.json["lvl_scores"][f"lvl_{self.lvl}_score"] = max(self.score,self.json["lvl_scores"][f"lvl_{self.lvl}_score"])
+                            # try:
+                            #     self.json["lvl_scores"][f"lvl_{self.lvl}_score"]
+                            # except:
+                            #     self.json["lvl_scores"][f"lvl_{self.lvl}_score"] = 0
+                            # self.json["lvl_scores"][f"lvl_{self.lvl}_score"] = max(self.score,self.json["lvl_scores"][f"lvl_{self.lvl}_score"])
                             self.lvl += 1
                             self.start(self.lvl)
                         else:
-                            try:
-                                self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"]
-                            except:
-                                self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"] = 0
-                            self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"] = max(self.score,self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"])
+                            # try:
+                            #     self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"]
+                            # except:
+                            #     self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"] = 0
+                            # self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"] = max(self.score,self.json["fan_lvl_scores"][f"lvl_{self.lvl_fan}_score"])
                             self.title_screen = True
                             self.Pantalla_de_titulo()
 

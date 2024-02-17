@@ -18,6 +18,9 @@ class Lvl_manager:
             shutil_copy('./lvls.sqlite3',self.path)
             self.base_de_datos = sqlite3.connect(self.path)
             self.cursor = self.base_de_datos.cursor()
+            self.cursor.execute("SELECT * FROM Niveles")
+
+        
 
     def search_lvl_blocks(self, id:int = None) -> list[tuple]:
         self.cursor.execute("SELECT b.*, c.* FROM Bloques b INNER JOIN Colores c ON c.id = b.id_color WHERE id_lvl=?",[id])

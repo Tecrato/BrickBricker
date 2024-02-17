@@ -5,29 +5,12 @@ trayecto 1-2? universidad
 semana santa
 
 
-separar el inicio de niveles custom y web en 2, y normalizar todo en lo que se parezca
-
 slow motion al romper un bloque
 
 hacer que la pantalla de carga tenga engranajes mientras inicia el juego (carga tan rapido que no vale la pena)
 
-Hacer que cuando se le da al boton de niveles web, se mueva la lista para dar espacio a otra lista que es la que si tendra los niveles de internet
-
 Usar _ para cuando declaro algo que no use, como en un for que no necesito la variable del for
 
-# --------------------
-for item in items:
-	if item:
-		print('Algo pas�')
-		break
-else:
-	print("No sucedi� nada raro en el for")
-
-# --------------------------------------
-def f(x):
-	return x-1
-
-results_walrus = [result for x in range(10) if (result := f(x)) > 3]
 
 # ------------------------------------------
 Quad-Tree
