@@ -21,6 +21,14 @@ class Lvl_manager:
             self.cursor.execute("SELECT * FROM Niveles")
 
         
+    def web_lvls_saved(self):
+        self.cursor.execute("SELECT nombre FROM Niveles_online")
+        datos = self.cursor.fetchall()
+        return datos
+    def search_web_lvl_saved(self,id):
+        self.cursor.execute("SELECT * FROM Niveles_online WHERE id=?",[id])
+        datos = self.cursor.fetchall()
+        return datos
 
     def search_lvl_blocks(self, id:int = None) -> list[tuple]:
         self.cursor.execute("SELECT b.*, c.* FROM Bloques b INNER JOIN Colores c ON c.id = b.id_color WHERE id_lvl=?",[id])
@@ -137,3 +145,16 @@ class Lvl_manager:
                 escape_button=1,
             )
         self.base_de_datos.commit()
+
+    def delete_web_lvl(self, id) -> None:
+        if id == '' or id == None or id == False:
+            return False
+
+        try:
+            self.cursor.execute("DELETE FROM Niveles_online WHERE id=?",[id])
+        except Exception as e:
+            pass
+        self.base_de_datos.commit()
+    
+    def close(self) -> None:
+        self.base_de_datos.close()

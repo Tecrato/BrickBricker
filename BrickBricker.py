@@ -1,6 +1,5 @@
 import pygame as pag, numpy, json
 from os import mkdir, path, startfile
-from concurrent.futures import ThreadPoolExecutor
 from pygame.locals import *
 from sys import exit as ex
 from io import open
@@ -21,8 +20,8 @@ from snake import Snake
 from sound import Set_sounds
 
 from lvl_manager import Lvl_manager
-
-
+from Utilidades import GUI
+from Utilidades import Funcs_pool
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
 
@@ -52,7 +51,6 @@ class BrickBricker(Botons_functions):
 
         
         #Variedad en las variables
-        self.hilos = ThreadPoolExecutor(2)
 
         # Cuenta contador, y saca cuenta
         self.life = 3
@@ -78,16 +76,16 @@ class BrickBricker(Botons_functions):
         self.acercandose = False
         self.alive = True
         self.bool_final_lvl = False
-        self.bool_title_confirm = False
         self.bool_web_lvls = False
         self.Drop_event_bool = False
         self.fan_lvl_bool = False
         self.low_detail_mode = False
-        self.title_screen_options_bool = False
+        self.ocupado: bool = False
         self.pausado = False
         self.playing = False
         self.title_fan_lvls_bool = False
         self.title_screen = True
+        self.title_screen_options_bool = False
         self.win = False
 
         # Para los FPS y deltatime
@@ -95,7 +93,7 @@ class BrickBricker(Botons_functions):
         self.framerate_general = 60
         self.framerate_dificultad = 90
 
-        self.txt = Create_text(['Cargando 0%','Cargando'],50,None,(400,350),color='white',padding=100,with_rect=True)
+        self.txt = Create_text('Cargando 0%\nCargando',50,None,(400,350),color='white',padding=100,with_rect=True)
         self.loading_text('0')
         pag.display.flip()
 
@@ -107,14 +105,13 @@ class BrickBricker(Botons_functions):
         self.load_json()
         pag.mixer_music.set_volume(self.json["music_volumen"])
 
-        del self.txt
-        # del self.loading_text
+        self.__delattr__('txt')
 
         self.Pantalla_de_titulo()
         self.Main_Process()
 
-    def loading_text(self,n, txt = 'Load resources'):
-        self.txt.change_text([f'Cargando {n}%',txt])
+    def loading_text(self,n, txt = 'Load resources') -> None:
+        self.txt.change_text(f'Cargando {n}%\n{txt}')
         self.txt.draw(self.ventana)
         pag.display.flip()
 
@@ -122,7 +119,14 @@ class BrickBricker(Botons_functions):
     def inilializar_juego(self) -> None:
 
         # Base de datos
-        self.lvl_manager = Lvl_manager(appdata+'/'+'lvls.sqlite3')
+        self.DB_path_name = appdata+'/'+'lvls.sqlite3'
+        self.lvl_manager = Lvl_manager(self.DB_path_name)
+
+        # Manejador de hilos mejorado
+        self.funcs_pool = Funcs_pool()
+        self.funcs_pool.add('cargar niveles',self.func_load_web_lvls)
+        self.funcs_pool.add('descargar nivel',lambda: self.load_web_lvl(self.lvl_fan))
+        self.funcs_pool.add('cambiar cancion',self.cambiar_musica)
 
         # Fuentes
         self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
@@ -176,9 +180,9 @@ class BrickBricker(Botons_functions):
 
         self.text_low_detail_mode = Create_boton('Low Detail Mode: X', 20, self.fuente_orbi_medium, (0,self.ventana_rect.h),  40, 'bottomleft', 'white', with_rect=False, func= self.func_low_detail_mode)
         self.button_toggle_fullscreen = Create_boton('', 30, self.fuente_simbolos, (30,self.text_low_detail_mode.rect.top),  0, dire='bottomleft',func=self.func_fullscreen)
-        self.button_del_progress = Create_boton('Borrar Progreso actual', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.50),  0,func=lambda:self.func_del_progress())
+        self.button_del_progress = Create_boton('Borrar Progreso actual', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.50),  0,func=lambda: self.GUI_admin.add(GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el progreso?'), self.func_del_progress))
 
-        self.lista_cosa=List_Box((220,500),(580,20), None,smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
+        self.lista_canciones=List_Box((220,500),(580,20), None,smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
 
 
                                                 # De la pausa
@@ -186,14 +190,6 @@ class BrickBricker(Botons_functions):
         self.pausa_text_X = Create_boton('Salir', 40, self.fuente_orbi_extrabold, (self.ventana_rect.w - 20,20), 20, 'topright', 'white', with_rect=True,color_rect='black', border_radius=40,func=self.func_pause_X)
 
 
-                                                # Del menu de confirmacion
-        self.text_title_confirm = Create_text(['Coloque \"si\"','si esta segur@'], 25, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery-70),  'center', 'black')
-        self.input_confirm = Input_text( (self.ventana_rect.centerx-95,self.ventana_rect.centery+10), (25,200), None, 'confirmacion')
-        self.all_inputs.append(self.input_confirm)
-
-        self.rect_title_confirm = pag.rect.Rect(0,0,300,250)
-        self.rect_title_confirm.center = self.ventana_rect.center
-        
         self.loading_text(28)
 
 
@@ -202,30 +198,33 @@ class BrickBricker(Botons_functions):
         self.boton_seleccionar = Create_boton('Seleccionar',35,None,(430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True, func=self.select_lvl)
         self.boton_borrar = Create_boton('Eliminar',35,None,(600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True, func=self.borrar_lvl)
         self.lista_fans_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
-            (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Id','Nombre'], 
+            (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, 5, padding_left=13, header_text=['Id','Nombre'], 
             colums_witdh=[0,.10], border_color=(20,20,20)) # (self.ventana_rect.width*.1, self.ventana_rect.height*.15)
         
         # Para niveles web
         self.boton_seleccionar_web = Create_boton('Seleccionar',35,None,(self.ventana_rect.w+430,105),10,'topleft','black',border_radius=0, border_width=-1, toggle_rect=True, func=self.select_lvl_web)
-        self.boton_borrar_web = Create_boton('Eliminar',35,None,(self.ventana_rect.w+600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True)
+        self.boton_borrar_web = Create_boton('Eliminar',35,None,(self.ventana_rect.w+600,105),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, toggle_rect=True, func=self.borrar_lvl_web)
         self.lista_web_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
-            (self.ventana_rect.width*1.1, self.ventana_rect.height*.15), 2, None, 30, padding_left=13, header_text=['Web_id','Nombre'], 
-            colums_witdh=[0,.15], border_color=(20,20,20))
+            (self.ventana_rect.width*1.1, self.ventana_rect.height*.15), 3, None, 30, padding_left=13, header_text=['Web_id','Nombre', ''], 
+            colums_witdh=[0,.15, .5], border_color=(20,20,20), fonts=[None, None, self.fuente_simbolos], default=['-','-',''])
         
-        self.boton_custom_lvls = Create_boton('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= lambda: self.hilos.submit(self.func_load_custom_lvls))
-        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= lambda: self.hilos.submit(self.func_see_web_lvls))
-        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda: self.hilos.submit(self.func_load_web_lvls))
-        [x.smothmove(60, 1, .7, 1) for x in [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]]
+        self.boton_custom_lvls = Create_boton('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= self.func_load_custom_lvls)
+        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= self.func_see_web_lvls)
+        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.go('cargar niveles'))
+        [x.smothmove(60, 1, .9, 1) for x in [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]]
 
         self.text_buscando_niveles: Create_text = Create_text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
         self.text_buscando_niveles.smothmove(60, 2, .7, 1)
 
 
                                                 # Del menu de extras
-        self.extras_nombre = Create_text(['Created','by','Edouard Sandoval'], 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
-        self.extras_version = Create_text('Version 1.7.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
+        self.extras_nombre = Create_text('Created\nby\nEdouard Sandoval', 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
+        self.extras_version = Create_text('Version 1.9.0',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
         self.social_media_github_button = Create_boton('',30,self.fuente_simbolos, (10,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://github.com/Tecrato'))
         self.social_media_youtube_button = Create_boton('輸',30,self.fuente_simbolos, (70,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://youtube.com/channel/UCeMfUcvDXDw2TPh-b7UO1Rw'))
+
+        # Ventanas emergentes
+        self.GUI_admin = GUI.GUI_admin(self.ventana)
 
 
         # Limites 
@@ -253,11 +252,11 @@ class BrickBricker(Botons_functions):
 
         self.BV_Volumen_Musica = Barra_de_progreso((self.ventana_rect.w - 30, self.ventana_rect.h - 30), 100)
         self.BV_Volumen_Musica_press = False
-        self.text_musica_vertical = Create_text(['M','u','s','i','c'], 20, self.fuente_consolas, (self.ventana_rect.w-50,self.ventana_rect.h - 120))
+        self.text_musica_vertical = Create_text('M\nu\ns\ni\nc', 20, self.fuente_consolas, (self.ventana_rect.w-50,self.ventana_rect.h - 120))
 
         self.BV_Volumen_Sonidos = Barra_de_progreso((self.ventana_rect.w - 80, self.ventana_rect.h - 30), 100)
         self.BV_Volumen_Sonidos_press = False
-        self.text_sonido_vertical = Create_text(['S','o','u','n','d'], 20, self.fuente_consolas, (self.ventana_rect.w-100,self.ventana_rect.h - 120))
+        self.text_sonido_vertical = Create_text('S\no\nu\nn\nd', 20, self.fuente_consolas, (self.ventana_rect.w-100,self.ventana_rect.h - 120))
 
         self.loading_text(42)
 
@@ -361,8 +360,8 @@ class BrickBricker(Botons_functions):
             p = self.music_var.load_music(self.json["music_dir"])
             self.text_song.change_text(p['text'])
             if len(self.music_var.canciones) > 0:
-                self.lista_cosa.change_list(self.music_var.canciones)
-                self.lista_cosa.select(p['index'])
+                self.lista_canciones.change_list(self.music_var.canciones)
+                self.lista_canciones.select(index=p['index'])
 
 
         # Si la musica esta pausada
@@ -592,8 +591,8 @@ class BrickBricker(Botons_functions):
         self.reset()
 
         if self.bool_web_lvls:
-            if  result := not self.lvl_manager.check_online_lvl(self.lvl_fan):
-                self.lvl_manager.guardar_nivel_online(self.load_web_lvl(self.lvl_fan))
+            if  not self.lvl_manager.check_online_lvl(self.lvl_fan):
+                self.funcs_pool.go('descargar nivel')
 
 
             # Cargar los bloques 
@@ -614,28 +613,10 @@ class BrickBricker(Botons_functions):
         self.update_bloques_rects()
 
 
-    def eventos_en_comun(self, e) -> None:
-        if not self.low_detail_mode: self.background.draw()
-        else: self.ventana.fill('black')
-
-        for event in e:
-            if event.type == QUIT:
-                pag.quit()
-                self.hilos.shutdown()
-                ex()
-            elif event.type == 50000:
-                self.hilos.submit(self.cambiar_musica, 'change')
-            elif event.type == KEYDOWN:
-                if event.key == K_F2 and len(self.music_var.canciones) > 0:
-                    self.hilos.submit(self.cambiar_musica, 'change')
-                elif event.key == K_F11:
-                    pag.display.toggle_fullscreen()
-
-    def cambiar_musica(self, acc: str) -> None:
-        if acc == 'change':
-            p = self.music_var.change()
-            self.text_song.change_text(p['text'])
-            self.lista_cosa.select(p['index'])
+    def cambiar_musica(self) -> None:
+        p = self.music_var.change()
+        self.text_song.change_text(p['text'])
+        self.lista_canciones.select(index=p['index'])
 
     def appli_powerup(self, type) -> None:
         if type == 1:
@@ -702,37 +683,24 @@ class BrickBricker(Botons_functions):
             return True
         return False
 
+    def eventos_en_comun(self, e) -> None:
+        if not self.low_detail_mode: self.background.draw()
+        else: self.ventana.fill('black')
+        
+        self.GUI_admin.input_update(e)
+        for event in e:
+            if event.type == QUIT:
+                pag.quit()
+                ex()
+            elif event.type == 50000:
+                self.funcs_pool.go('cambiar cancion')
+            elif event.type == KEYDOWN:
+                if event.key == K_F2 and len(self.music_var.canciones) > 0:
+                    self.funcs_pool.go('cambiar cancion')
+                elif event.key == K_F11:
+                    pag.display.toggle_fullscreen()
 
 
-    def title_confirm(self) -> None:
-        self.input_confirm.typing = True
-        while self.bool_title_confirm:
-
-            self.eventos_en_comun(eventos := pag.event.get())
-
-            #Para el input
-            for en in self.all_inputs:
-                if resultado := en.eventos_teclado(eventos) == "enter" and self.all_inputs[0].get_text():
-                    if resultado == "si":
-                        self.bool_title_confirm = False
-                        return True
-                    else: 
-                        return False
-            #Fin del input
-            for eventos in eventos:
-                if eventos.type == pag.KEYDOWN and eventos.key == K_ESCAPE:
-                    self.bool_title_confirm = False
-                if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
-                    if self.pausa_text_X.rect.collidepoint(eventos.pos):
-                        self.bool_title_confirm = False
-
-            pag.draw.rect(self.ventana, 'lightgrey', self.rect_title_confirm, border_radius=20)
-            self.text_title_confirm.draw(self.ventana)
-            self.input_confirm.draw(self.ventana)
-            self.pausa_text_X.draw(self.ventana)
-
-            pag.display.flip()
-            self.relog.tick(30)
 
     def title_extras(self) -> None:
         while self.bool_title_extras:
@@ -765,29 +733,37 @@ class BrickBricker(Botons_functions):
 
     def Pantalla_niveles_fans(self) -> None:
         while self.title_fan_lvls_bool:
+            mx,my = pag.mouse.get_pos()
             self.eventos_en_comun(eventos := pag.event.get())
 
-            for eventos in eventos:
-                if eventos.type == KEYDOWN and eventos.key == K_ESCAPE:
+            for evento in eventos:
+                if self.GUI_admin.active >= 0:
+                    if evento.type == KEYDOWN and evento.key == K_ESCAPE:
+                        self.GUI_admin.pop()
+                    elif evento.type == MOUSEBUTTONDOWN and evento.button == 1:
+                        self.GUI_admin.click((mx,my))
+                elif self.ocupado:
+                    break
+                elif evento.type == KEYDOWN and evento.key == K_ESCAPE:
                     self.title_fan_lvls_bool = False
-                if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
-                    if self.lista_fans_lvls.rect.collidepoint(eventos.pos):
-                        if p := self.lista_fans_lvls.select():
+                elif evento.type == MOUSEBUTTONDOWN and evento.button == 1:
+                    if self.lista_fans_lvls.rect.collidepoint(evento.pos):
+                        if (p := self.lista_fans_lvls.click(evento.pos)):
                             self.lvl_fan = p[0]
                             self.lvl_fan_name = p[1]
-                    elif self.lista_web_lvls.rect.collidepoint(eventos.pos):
-                        if p := self.lista_web_lvls.select():
+                    elif self.lista_web_lvls.rect.collidepoint(evento.pos):
+                        if (p := self.lista_web_lvls.click(evento.pos)):
                             self.lvl_fan = p[0]
                             self.lvl_fan_name = p[1]
-                    elif self.pausa_text_X.rect.collidepoint(eventos.pos):
+                    elif self.pausa_text_X.rect.collidepoint(evento.pos):
                         self.title_fan_lvls_bool = False
                     for b in self.botones_custom_lvls_list:
-                        if b.rect.collidepoint(eventos.pos):
+                        if b.rect.collidepoint(evento.pos):
                             b.click()
-                elif eventos.type == MOUSEWHEEL and self.lista_fans_lvls.rect.collidepoint(pag.mouse.get_pos()):
-                    self.lista_fans_lvls.rodar(eventos.y * 15)
+                elif evento.type == MOUSEWHEEL and self.lista_fans_lvls.rect.collidepoint((mx,my)):
+                    self.lista_fans_lvls.rodar(evento.y * 15)
 
-                if eventos.type == MOUSEBUTTONUP:
+                if evento.type == MOUSEBUTTONUP:
                     self.lista_fans_lvls.scroll = False
 
             if not self.low_detail_mode:
@@ -802,6 +778,7 @@ class BrickBricker(Botons_functions):
             for b in self.texts_lvls_fans_list:
                 b.draw(self.ventana)
             
+            self.GUI_admin.draw(self.ventana, (mx,my))
 
             pag.display.flip()
             self.relog.tick(60)
@@ -813,7 +790,6 @@ class BrickBricker(Botons_functions):
             for eventos in eventos:
                 if eventos.type == KEYDOWN and eventos.key == K_ESCAPE:
                     pag.quit()
-                    self.hilos.shutdown()
                     ex()
                 if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
                     for b in self.botones_title_list:
@@ -837,55 +813,61 @@ class BrickBricker(Botons_functions):
     def options_menu(self) -> None:
         self.title_screen_options_bool = True
         while self.title_screen_options_bool:
-            self.eventos_en_comun(evento:=pag.event.get())
+            mx,my = pag.mouse.get_pos()
+            self.eventos_en_comun(eventos:=pag.event.get())
 
-            for eventos in evento:
-                if eventos.type == DROPFILE and self.Drop_event_bool:
+            for evento in eventos:
+                if evento.type == DROPFILE and self.Drop_event_bool:
                     self.button_load_music.change_color_ad('white','grey')
                     self.button_load_music.change_text('Cargar musica')
                     self.Drop_event_bool = False
-                    if p := self.music_var.load_music(eventos.file):
+                    if p := self.music_var.load_music(evento.file):
                         self.text_song.change_text(p['text'])
                         self.json["music_dir"] = self.music_var.music_dir
                         self.savejson()
                         if len(self.music_var.canciones) > 0:
-                            self.lista_cosa.change_list(self.music_var.canciones)
-                            self.lista_cosa.select(p['index'])
-                if eventos.type == KEYDOWN and eventos.key == K_ESCAPE:
+                            self.lista_canciones.change_list(self.music_var.canciones)
+                            self.lista_canciones.select(p['index'])
+                elif self.GUI_admin.active >= 0:
+                    if evento.type == KEYDOWN and evento.key == K_ESCAPE:
+                        self.GUI_admin.pop()
+                    elif evento.type == MOUSEBUTTONDOWN and evento.button == 1:
+                        self.GUI_admin.click((mx,my))
+                elif evento.type == KEYDOWN and evento.key == K_ESCAPE:
                     self.title_screen_options_bool = False
                     self.savejson()
                     self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.3))
-                if eventos.type == MOUSEBUTTONDOWN and eventos.button == 1:
+                elif evento.type == MOUSEBUTTONDOWN and evento.button == 1:
                     if self.Drop_event_bool == True:
                         self.button_load_music.change_color_ad('white','grey')
                         self.button_load_music.change_text('Cargar musica')
                         self.Drop_event_bool = False
 
                     for b in self.botones_options_list:
-                        if b.rect.collidepoint(eventos.pos):
+                        if b.rect.collidepoint(evento.pos):
                             b.click()
 
-                    if self.salir_text_title.rect.collidepoint(eventos.pos):
+                    if self.salir_text_title.rect.collidepoint(evento.pos):
                         self.sounds.boton1.play()
                         self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.3))
                         self.title_screen_options_bool = False
                         self.savejson()
 
-                    elif self.BV_Volumen_Musica.rect2.collidepoint(eventos.pos):
+                    elif self.BV_Volumen_Musica.rect2.collidepoint(evento.pos):
                         self.BV_Volumen_Musica_press = True
-                    elif self.BV_Volumen_Sonidos.rect2.collidepoint(eventos.pos):
+                    elif self.BV_Volumen_Sonidos.rect2.collidepoint(evento.pos):
                         self.BV_Volumen_Sonidos_press = True
-                    elif self.lista_cosa.rect.collidepoint(eventos.pos):
-                        p = self.lista_cosa.select()
+                    elif self.lista_canciones.rect.collidepoint(evento.pos):
+                        p = self.lista_canciones.click(evento.pos)
                         if p and p != 'scrolling':
                             self.text_song.change_text(self.music_var.change(p['text'])['text'])
-                elif eventos.type == MOUSEWHEEL and self.lista_cosa.rect.collidepoint(pag.mouse.get_pos()):
-                    self.lista_cosa.rodar(eventos.y * 15)
+                elif evento.type == MOUSEWHEEL and self.lista_canciones.rect.collidepoint((mx,my)):
+                    self.lista_canciones.rodar(evento.y * 15)
 
-                if eventos.type == MOUSEBUTTONUP:
+                elif evento.type == MOUSEBUTTONUP:
                     self.BV_Volumen_Musica_press = False
                     self.BV_Volumen_Sonidos_press = False
-                    self.lista_cosa.scroll = False
+                    self.lista_canciones.scroll = False
 
             #Barras de sonido
             if self.BV_Volumen_Sonidos_press:
@@ -898,7 +880,7 @@ class BrickBricker(Botons_functions):
                 self.json["music_volumen"] = self.BV_Volumen_Musica.volumen
 
 
-            self.lista_cosa.draw(self.ventana)
+            self.lista_canciones.draw(self.ventana)
 
             if not self.low_detail_mode:
                 self.Serpiente.update()
@@ -909,6 +891,7 @@ class BrickBricker(Botons_functions):
 
             pag.draw.circle(self.ventana, 'white', self.button_toggle_fullscreen.rect.center, 27, 4)
                 
+            self.GUI_admin.draw(self.ventana, (mx,my))
 
             pag.display.flip()
             self.relog.tick(60)
