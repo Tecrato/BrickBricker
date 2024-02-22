@@ -427,7 +427,7 @@ class BrickBricker(Botons_functions):
                 self.mulpliquer += 1
                 self.score += 100 * self.mulpliquer
                 self.score_text.change_text(f'Score {self.score}')
-                if  self.bloques[choque]['power']:
+                if  self.bloques[choque]['power'] and self.bloques[choque]['power'] < 7:
                     self.powers.append(PowerUp(self.ventana, self.bloques[choque]['rect'].center, self.bloques[choque]['power'], 25))
                 if not self.low_detail_mode:
                     self.float_texts_list.append(Float_text(f'+{100*self.mulpliquer} X {self.mulpliquer}',20,self.fuente_nerd_mono,self.bloques[choque]['rect'].center,self.ventana))
@@ -466,7 +466,7 @@ class BrickBricker(Botons_functions):
                         self.mulpliquer += 1
                         self.score += 100 * self.mulpliquer
                         self.score_text.change_text(f'Score {self.score}')
-                        if x['power']:
+                        if x['power'] and x['power'] < 7:
                             self.powers.append(PowerUp(self.ventana, x['rect'].center, x['power'], 25))
                         if not self.low_detail_mode:
                             self.float_texts_list.append(Float_text(f'+{100*self.mulpliquer} X {self.mulpliquer}',20,self.fuente_nerd_mono,x['rect'].center,self.ventana))
@@ -608,7 +608,7 @@ class BrickBricker(Botons_functions):
         else:
             bloques = self.lvl_manager.search_custom_lvl_blocks(self.lvl_fan)
         
-        self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': (numpy.random.randint(1,6) if b[8] == 0 and numpy.random.randint(0,10000) < 700 else b[8]), 'color': (b[10],b[11],b[12])} for b in bloques]
+        self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': (numpy.random.randint(1,6) if numpy.random.randint(0,10000) < 1000 else 7) if b[8] != 0 else b[8], 'color': (b[10],b[11],b[12])} for b in bloques]
         
         self.update_bloques_rects()
 

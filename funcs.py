@@ -8,7 +8,7 @@ class Botons_functions:
         lvl_manager = Lvl_manager(self.DB_path_name)
         for li in lista:
             if lvl_manager.search_web_lvl_saved(li[0]):
-                li.append('')
+                li.append('')
             else:
                 li.append('')
         lvl_manager.close()
