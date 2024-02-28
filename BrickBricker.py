@@ -1,10 +1,11 @@
-import pygame as pag, numpy, json
+import pygame as pag, numpy, json, random
 from os import mkdir, path, startfile
 from pygame.locals import *
 from sys import exit as ex
 from io import open
 from platformdirs import user_data_dir
 from Utilidades import *
+from pygame import Vector2
 
 
 from balls import Ball
@@ -82,6 +83,13 @@ class BrickBricker(Botons_functions):
         self.relog = pag.time.Clock()
         self.framerate_general = 60
         self.framerate_dificultad = 90
+        
+        # Fuentes
+        self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
+        self.fuente_orbi_medium = 'Assets/Fuentes/Orbitron-Medium.ttf'
+        self.fuente_orbi_extrabold = 'Assets/Fuentes/Orbitron-ExtraBold.ttf'
+        self.fuente_consolas = 'Assets/Fuentes/consola.ttf'
+        self.fuente_simbolos = 'Assets/Fuentes/Symbols.ttf'
 
         self.txt = Create_text('Cargando 0%\nCargando',50,None,(400,350),color='white',padding=100,with_rect=True)
         self.loading_text('0')
@@ -108,6 +116,8 @@ class BrickBricker(Botons_functions):
 
     def inilializar_juego(self) -> None:
 
+        GUI.configs['fuente_simbolos'] = self.fuente_simbolos
+
         # Base de datos
         self.DB_path_name = appdata+'/'+'lvls.sqlite3'
         self.lvl_manager = Lvl_manager(self.DB_path_name)
@@ -125,20 +135,13 @@ class BrickBricker(Botons_functions):
         self.ball = Ball((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7), 10, self.ventana, [0,0])
 
         # Ventanas emergentes
-        self.GUI_admin = GUI.GUI_admin(self.ventana)
+        self.GUI_admin = GUI.GUI_admin()
 
         # Limites 
         self.limite_inferior = pag.rect.Rect(0, self.ventana_rect.height-15, self.ventana_rect.width, 50)
         self.limite_superior = pag.rect.Rect(-50, -47, self.ventana_rect.width+150, 50)
         self.limite_derecho = pag.rect.Rect(self.ventana_rect.width-2, -50, 50, self.ventana_rect.height+100)
         self.limite_izquierdo = pag.rect.Rect(-48, -50, 50, self.ventana_rect.height+100)
-
-        # Fuentes
-        self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
-        self.fuente_orbi_medium = 'Assets/Fuentes/Orbitron-Medium.ttf'
-        self.fuente_orbi_extrabold = 'Assets/Fuentes/Orbitron-ExtraBold.ttf'
-        self.fuente_consolas = 'Assets/Fuentes/consola.ttf'
-        self.fuente_simbolos = 'Assets/Fuentes/Symbols.ttf'
 
         # Variable Musica/Sonidos
         self.music_var = Set_music()
@@ -247,11 +250,11 @@ class BrickBricker(Botons_functions):
         self.boton_retry_musica = Create_boton('', 20, self.fuente_simbolos, (self.ventana_rect.w-80,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, sound_to_click=self.sounds.boton1,func=self.func_music_retry)
         self.boton_random_musica = Create_boton('列', 20, self.fuente_simbolos, (self.ventana_rect.w-110,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, sound_to_click=self.sounds.boton1,func=self.func_music_random)
 
-        self.BV_Volumen_Musica = Barra_de_progreso((self.ventana_rect.w - 30, self.ventana_rect.h - 30), 100)
+        self.BV_Volumen_Musica = Barra_de_progreso((self.ventana_rect.w - 30, self.ventana_rect.h - 30), [15,100])
         self.BV_Volumen_Musica_press = False
         self.text_musica_vertical = Create_text('M\nu\ns\ni\nc', 20, self.fuente_consolas, (self.ventana_rect.w-50,self.ventana_rect.h - 120))
 
-        self.BV_Volumen_Sonidos = Barra_de_progreso((self.ventana_rect.w - 80, self.ventana_rect.h - 30), 100)
+        self.BV_Volumen_Sonidos = Barra_de_progreso((self.ventana_rect.w - 80, self.ventana_rect.h - 30), [15,100])
         self.BV_Volumen_Sonidos_press = False
         self.text_sonido_vertical = Create_text('S\no\nu\nn\nd', 20, self.fuente_consolas, (self.ventana_rect.w-100,self.ventana_rect.h - 120))
 
@@ -282,11 +285,11 @@ class BrickBricker(Botons_functions):
         self.botones_options_list.extend(self.botones_song_list)
 
         self.texts_lvls_fans_list = [
-            self.text_created_lvls,
-            self.text_buscando_niveles,
-            self.pausa_text_X,
             self.lista_fans_lvls,
             self.lista_web_lvls,
+            self.text_created_lvls,
+            self.pausa_text_X,
+            self.text_buscando_niveles,
         ]
         self.botones_custom_lvls_list = [
             self.boton_seleccionar,

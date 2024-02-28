@@ -1,13 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
-block_cipher = None
-
-
+# Brickbricker
 a = Analysis(
     ['BrickBricker.py'],
-    pathex=[],
-    binaries=[],
     datas=[
         ('./Assets/Fuentes/*.ttf', './Assets/Fuentes/'),
         ('./Assets/images/pelota.png','./Assets/images/'),
@@ -19,30 +15,19 @@ a = Analysis(
         ('./lvls.sqlite3','./'),
         ('./instrucciones.txt','./')
     ],
-    hiddenimports=[],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
-    [],
     name='BrickBricker',
     exclude_binaries=True,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
@@ -50,6 +35,36 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon='Screenshot_10.ico',
+)
+
+# Lvl Creator
+a_2 = Analysis(
+    ['lvl_creator.py'],
+    datas=[
+        ('./lvl_c.ico','./'),
+    ],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    noarchive=False,
+)
+pyz_2 = PYZ(a.pure, a.zipped_data)
+
+exe_2 = EXE(
+    pyz_2,
+    a_2.scripts,
+    exclude_binaries=True,
+    name='lvl_creator',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='lvl_c.ico',
 )
 
 
@@ -64,12 +79,12 @@ build_options = {
 }
 coll = COLLECT(
     exe,
+    exe_2,
     a.binaries,
-    a.zipfiles,
     a.datas,
+    a_2.datas,
     strip=False,
     upx=True,
-    upx_exclude=[],
     name='BrickBricker',
     **build_options
 )
