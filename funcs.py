@@ -74,7 +74,8 @@ class Botons_functions:
         else:
             self.text_low_detail_mode.change_text('Low Detail Mode: X')
 
-    def func_del_progress(self) -> None:
+    def func_del_progress(self, result) -> None:
+        if result == 'cancelar': return 0
         self.bool_title_confirm = True
         if self.title_confirm():
             self.json["lvlLimit"] = 1
@@ -136,12 +137,12 @@ class Botons_functions:
     def borrar_lvl(self) -> None:
         self.GUI_admin.add(
             GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el nivel?'), 
-            lambda result: (self.lvl_manager.delete_custom_lvl(self.lvl_fan),self.lista_fans_lvls.change_list(self.lvl_manager.search_custom_lvls_list()))
+            lambda result: (self.lvl_manager.delete_custom_lvl(self.lvl_fan),self.lista_fans_lvls.change_list(self.lvl_manager.search_custom_lvls_list())) if result == 'aceptar' else None
             )
     def borrar_lvl_web(self) -> None:
         self.GUI_admin.add(
             GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el nivel?'), 
-            lambda result: (self.lvl_manager.delete_web_lvl(self.lvl_fan),self.funcs_pool.go('cargar niveles'))
+            lambda result: (self.lvl_manager.delete_web_lvl(self.lvl_fan),self.funcs_pool.go('cargar niveles')) if result == 'aceptar' else None 
             )
 
     def func_load_custom_lvls(self) -> None:

@@ -860,6 +860,7 @@ class BrickBricker(Botons_functions):
             pag.display.flip()
             self.relog.tick(60)
 
+
     def pause(self) -> None:
         while self.pausado:
             self.eventos_en_comun(eventos := pag.event.get())
