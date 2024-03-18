@@ -141,7 +141,7 @@ class Botons_functions:
             )
     def borrar_lvl_web(self) -> None:
         self.GUI_admin.add(
-            GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el nivel?'), 
+            GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar los datos del nivel?'), 
             lambda result: (self.lvl_manager.delete_web_lvl(self.lvl_fan),self.funcs_pool.go('cargar niveles')) if result == 'aceptar' else None 
             )
 
