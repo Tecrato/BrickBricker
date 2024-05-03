@@ -27,12 +27,12 @@ class Botons_functions:
         self.start(self.lvl)
 
     def func_opciones(self) -> None:
-        self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.65))
+        self.salir_text_title.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.65)
         self.options_menu()
 
     def func_extras(self) -> None:
         self.bool_title_extras = True
-        self.salir_text_title.move((self.ventana_rect.centerx,self.ventana_rect.centery * 1.65))
+        self.salir_text_title.pos = (self.ventana_rect.centerx,self.ventana_rect.centery * 1.65)
         self.title_extras()
 
     def func_fan_lvls_title(self) -> None:
@@ -70,9 +70,9 @@ class Botons_functions:
         self.low_detail_mode = not self.low_detail_mode
         self.json['low_detail'] = self.low_detail_mode
         if self.low_detail_mode:
-            self.text_low_detail_mode.change_text('Low Detail Mode: O')
+            self.text_low_detail_mode.text = 'Low Detail Mode: O'
         else:
-            self.text_low_detail_mode.change_text('Low Detail Mode: X')
+            self.text_low_detail_mode.text = 'Low Detail Mode: X'
 
     def func_del_progress(self, result) -> None:
         if result == 'cancelar': return 0
@@ -80,7 +80,7 @@ class Botons_functions:
         if self.title_confirm():
             self.json["lvlLimit"] = 1
             self.lvl_max = 1
-            self.boton_reanudar.move((-500,-500))
+            self.boton_reanudar.pos = (-500,-500)
             self.savejson()
 
     def func_fullscreen(self) -> None:
@@ -89,7 +89,7 @@ class Botons_functions:
     def func_drop_music_file(self) -> None:
         self.Drop_event_bool = True
         self.button_load_music.change_color_ad('green')
-        self.button_load_music.change_text('Arrastra tu carpeta/cancion aca!')
+        self.button_load_music.text = 'Arrastra tu carpeta/cancion aca!'
 
 
 # -------------------------------------------------- Music Botons --------------------------------------------#
@@ -101,15 +101,15 @@ class Botons_functions:
             pag.mixer_music.play()
     def func_music_pause(self) -> None:
         if p := self.music_var.pause():
-            self.boton_pause_musica.change_text('')
+            self.boton_pause_musica.text = ''
         else:
-            self.boton_pause_musica.change_text('')
+            self.boton_pause_musica.text = ''
         self.json["music_pause"] = p
     def func_music_random(self) -> None:
         if r := self.music_var.set_random():
-            self.boton_random_musica.change_text('列')
+            self.boton_random_musica.text = '列'
         else:
-            self.boton_random_musica.change_text('')
+            self.boton_random_musica.text = ''
         self.json["music_random"] = r
 
 
@@ -148,36 +148,35 @@ class Botons_functions:
     def func_load_custom_lvls(self) -> None:
         if self.bool_web_lvls:
             self.bool_web_lvls: bool = False
-            [x.move_rel((self.ventana_rect.width, 0)) for x in [
-                self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,
-                self.boton_borrar_web,self.boton_web_lvls
-                ]]
-            self.boton_web_lvls.move_rel((50,0))
-            self.boton_custom_lvls.move_rel((-200,0))
-            self.boton_reload_web_lvls.move_rel((-100,0))
+            for x in [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,
+                self.boton_borrar_web,self.boton_web_lvls]:
+                x.pos += (self.ventana_rect.width, 0)
+            self.boton_web_lvls.pos += (50,0)
+            self.boton_custom_lvls.pos += (-200,0)
+            self.boton_reload_web_lvls.pos += (-100,0)
 
         self.lista_fans_lvls.change_list(self.lvl_manager.search_custom_lvls_list())
 
     def func_see_web_lvls(self) -> None:
         if not self.bool_web_lvls:
             self.bool_web_lvls: bool = True
-            [x.move_rel((-self.ventana_rect.width, 0)) for x in [
-                self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,
-                self.boton_borrar_web,self.boton_web_lvls
-                ]]
-            self.boton_web_lvls.move_rel((-50,0))
-            self.boton_custom_lvls.move_rel((200,0))
-            self.boton_reload_web_lvls.move_rel((100,0))
+            for x in [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,
+                self.boton_borrar_web,self.boton_web_lvls]:
+                x.pos -= (self.ventana_rect.width, 0)
+
+            self.boton_web_lvls.pos -= (50,0)
+            self.boton_custom_lvls.pos -= (-200,0)
+            self.boton_reload_web_lvls.pos += (100,0)
 
     def func_load_web_lvls(self) -> None:
         self.ocupado = True
         " Esta función carga los niveles desde el servidor en internet. "
         
 
-        self.text_buscando_niveles.change_text('Buscando niveles')
+        self.text_buscando_niveles.text = 'Buscando niveles'
         
-        self.text_buscando_niveles.normal_move()
-        self.text_buscando_niveles.move(self.ventana_rect.center)
+        # self.text_buscando_niveles.normal_move()
+        self.text_buscando_niveles.pos = self.ventana_rect.center
 
 
         try:
@@ -186,38 +185,38 @@ class Botons_functions:
                 lista = var.json()['niveles']
                 lista = self.check_web_lvls_list(lista)
                 self.lista_web_lvls.change_list(lista)
-                self.text_buscando_niveles.change_text('Exito')
+                self.text_buscando_niveles.text = 'Exito'
             elif var.status_code == 404:
-                self.text_buscando_niveles.change_text('No se ah encontrado la pagina web')
+                self.text_buscando_niveles.text = 'No se ah encontrado la pagina web'
             else:
                 print(var.status_code)
         except Exception as err:
             print(err)
-            self.text_buscando_niveles.change_text('Verifique su conexion a internet')
+            self.text_buscando_niveles.text = 'Verifique su conexion a internet'
         finally:
             self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
-            self.text_buscando_niveles.move(pag.Vector2(self.ventana_rect.center) - (0,self.ventana_rect.height))
+            self.text_buscando_niveles.pos = pag.Vector2(self.ventana_rect.center) - (0,self.ventana_rect.height)
             self.ocupado = False
         
     def load_web_lvl(self,id:str) -> None:
         self.ocupado = True
-        self.text_buscando_niveles.change_text('Descargando nivel')
+        self.text_buscando_niveles.text = 'Descargando nivel'
         self.text_buscando_niveles.normal_move()
-        self.text_buscando_niveles.move(self.ventana_rect.center)
+        self.text_buscando_niveles.pos = self.ventana_rect.center
 
         try:
             var = requests.get(f'https://Tecrato.pythonanywhere.com/api/get_lvl?id={id}',timeout=7)
             if var.status_code == 200:
-                self.text_buscando_niveles.change_text('Exito')
+                self.text_buscando_niveles.text = 'Exito'
                 lvl_manager = Lvl_manager(self.DB_path_name)
                 lvl_manager.guardar_nivel_online(var.json())
                 self.func_load_web_lvls()
             elif var.status_code == 404:
-                self.text_buscando_niveles.change_text('Error al conectar con la API')
+                self.text_buscando_niveles.text = 'Error al conectar con la API'
         except Exception as err:
             print(err)
-            self.text_buscando_niveles.change_text('Verifique su conexion a internet')
+            self.text_buscando_niveles.text = 'Verifique su conexion a internet'
         finally:
             self.text_buscando_niveles.smothmove(120, .5, .3, -1.5)
-            self.text_buscando_niveles.move(pag.Vector2(self.ventana_rect.center) - (0,self.ventana_rect.height))
+            self.text_buscando_niveles.pos = pag.Vector2(self.ventana_rect.center) - (0,self.ventana_rect.height)
             self.ocupado = False
