@@ -39,7 +39,7 @@ class Effect:
                 self.particles.append(Particles(self.surface,3,False,size,3,0,
                     self.coord,
                     (sin(radians(24*i))*3,cos(radians(24*i))*3),
-                    'yellow', (random.randint(0,20),random.randint(0,20),random.randint(0,20))))
+                    (255, 255, 0, 255), (random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))))
                 # print(sin(radians(24*i))*3,cos(radians(24*i))*3)
                 
         elif self.type == 4:

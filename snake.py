@@ -7,7 +7,7 @@ class Snake:
         self.surface = surface
         self.surface_rect = self.surface.get_rect()
 
-        self.particles = Particles(self.surface)
+        self.particles = Particles(self.surface, radius=10)
         self.reset()
 
 

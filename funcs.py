@@ -95,7 +95,7 @@ class Botons_functions:
 # -------------------------------------------------- Music Botons --------------------------------------------#
     def func_music_next(self) -> None:
         if len(self.music_var.canciones) > 0:
-            self.funcs_pool.go('cambiar cancion')
+            self.funcs_pool.start('cambiar cancion')
     def func_music_retry(self) -> None:
         if len(self.music_var.canciones) > 0:
             pag.mixer_music.play()
@@ -142,7 +142,7 @@ class Botons_functions:
     def borrar_lvl_web(self) -> None:
         self.GUI_admin.add(
             GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar los datos del nivel?'), 
-            lambda result: (self.lvl_manager.delete_web_lvl(self.lvl_fan),self.funcs_pool.go('cargar niveles')) if result == 'aceptar' else None 
+            lambda result: (self.lvl_manager.delete_web_lvl(self.lvl_fan),self.funcs_pool.start('cargar niveles')) if result == 'aceptar' else None 
             )
 
     def func_load_custom_lvls(self) -> None:

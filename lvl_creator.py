@@ -86,7 +86,7 @@ class lvl_creator_for_BrickBricker:
 
         #Input text
         self.text_title_guardar = Create_text('Paso final', 25, 'Assets/Fuentes/Orbitron-ExtraBold.ttf', (self.ventana_rect.centerx,self.ventana_rect.centery-70), 'center', 'black')
-        self.input_nombre = Input_text((self.ventana_rect.centerx-95,self.ventana_rect.centery+10), (25,200), None, 'Nombre del nivel')
+        self.input_nombre = Input_text((self.ventana_rect.centerx-95,self.ventana_rect.centery+10), 25, None, text_value='Nombre del nivel', padding=(25,200))
         self.all_inputs.append(self.input_nombre)
 
         self.rect_title_guardar = pag.rect.Rect(0,0,300,250)
@@ -251,7 +251,7 @@ class lvl_creator_for_BrickBricker:
                 for x in range(32):
                     self.bloques.append({'rect': pag.rect.Rect(20 * x + 80,20 * y + 80, 20, 20), 'effect': 2, 'color': (125,125,125), 'active': True, 'cambio': True, 'border_radius': 10000, 'power':0})
             
-        self.boton_border_radius.change_color('green' if self.mucho_border_radius == True else 'black')
+        self.boton_border_radius.color = 'green' if self.mucho_border_radius == True else 'black'
 
                     
         self.update_bloques_rects()
@@ -316,7 +316,7 @@ class lvl_creator_for_BrickBricker:
                         self.boton_color_capture.change_color_ad('green')
                 elif eventos.type == MOUSEWHEEL and self.brocha:
                     self.distancia_borrando += eventos.y
-                    self.text_boton_borrar_distance.change_text(f'{self.distancia_borrando}')
+                    self.text_boton_borrar_distance.text = f'{self.distancia_borrando}'
                 elif eventos.type == MOUSEBUTTONDOWN and eventos.button == 3:
                         self.boton_color_capture.change_color_ad('green')
                         self.capturando_color = True
@@ -342,18 +342,18 @@ class lvl_creator_for_BrickBricker:
                         if self.upgrade_selected > 7:
                             self.upgrade_selected = 0
                         for x in self.powers:
-                            x.move((-45,300))
-                        self.powers[self.upgrade_selected].move((45,300))
+                            x.pos = ((-45,300))
+                        self.powers[self.upgrade_selected].pos = (45,300)
                     elif self.boton_back_U.rect.collidepoint(eventos.pos):
                         self.upgrade_selected -= 1
                         if self.upgrade_selected < 0:
                             self.upgrade_selected = 7
                         for x in self.powers:
-                            x.move((-45,300))
-                        self.powers[self.upgrade_selected].move((45,300))
+                            x.pos = ((-45,300))
+                        self.powers[self.upgrade_selected].pos = (45,300)
                     for x in self.to_function_list:
                         if x.rect.collidepoint(eventos.pos):
-                            x.click()
+                            x.click((mx,my))
                             break
                     else:
                         self.boton_color_capture.change_color_ad('black')

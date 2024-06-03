@@ -151,7 +151,7 @@ class BrickBricker(Botons_functions):
 
         # Aun mas cosas
         self.Serpiente = Snake(self.ventana)
-        self.particles_ball = Particles(self.ventana, 2)
+        self.particles_ball = Particles(self.ventana, 2, radius=10,degrad_vel=.5)
         self.background = Background(self.ventana,(800,700),2)
         self.background2 = Background(self.ventana,(800,700),3)
         self.deltatime = Deltatime(90)
@@ -230,7 +230,7 @@ class BrickBricker(Botons_functions):
         
         self.boton_custom_lvls = Create_boton('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= self.func_load_custom_lvls)
         self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= self.func_see_web_lvls)
-        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.go('cargar niveles'))
+        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.start('cargar niveles'))
         l = [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]
         for x in l:
             x.smothmove(60, 1, .9, 1) 
@@ -569,7 +569,7 @@ class BrickBricker(Botons_functions):
 
         if self.bool_web_lvls:
             if  not self.lvl_manager.check_online_lvl(self.lvl_fan):
-                self.funcs_pool.go('descargar nivel')
+                self.funcs_pool.start('descargar nivel')
 
 
             # Cargar los bloques 
@@ -669,10 +669,10 @@ class BrickBricker(Botons_functions):
                 pag.quit()
                 ex()
             elif event.type == 50000:
-                self.funcs_pool.go('cambiar cancion')
+                self.funcs_pool.start('cambiar cancion')
             elif event.type == KEYDOWN:
                 if event.key == K_F2 and len(self.music_var.canciones) > 0:
-                    self.funcs_pool.go('cambiar cancion')
+                    self.funcs_pool.start('cambiar cancion')
                 elif event.key == K_F11:
                     pag.display.toggle_fullscreen()
 
@@ -1055,7 +1055,7 @@ class BrickBricker(Botons_functions):
                 self.text_win.draw(self.ventana)
                 self.boton_win.draw(self.ventana)
                 if self.efecto_win.update():
-                    self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)),self.ventana, 20)
+                    self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)),self.ventana, 50)
                 
                 self.efecto_win.draw()
             elif self.alive:
