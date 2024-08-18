@@ -151,7 +151,7 @@ class BrickBricker(Botons_functions):
 
         # Aun mas cosas
         self.Serpiente = Snake(self.ventana)
-        self.particles_ball = Particles(self.ventana, 2, radius=10,degrad_vel=.5)
+        self.particles_ball = Particles(self.ventana, 2, radius=7,degrad_vel=.2)
         self.background = Background(self.ventana,(800,700),2)
         self.background2 = Background(self.ventana,(800,700),3)
         self.deltatime = Deltatime(90)
