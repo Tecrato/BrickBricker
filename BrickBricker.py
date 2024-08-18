@@ -1,4 +1,4 @@
-import pygame as pag, numpy, json, random
+import pygame as pag, math, json, random
 from os import mkdir, path, startfile
 from pygame.locals import *
 from sys import exit as ex
@@ -91,7 +91,7 @@ class BrickBricker(Botons_functions):
         self.fuente_consolas = 'Assets/Fuentes/consola.ttf'
         self.fuente_simbolos = 'Assets/Fuentes/Symbols.ttf'
 
-        self.txt = Create_text('Cargando 0%\nCargando',50,None,(400,350),color='white',padding=100,with_rect=True,color_rect='black')
+        self.txt = Text('Cargando 0%\nCargando',50,None,(400,350),color='white',padding=100,with_rect=True,color_rect='black')
         self.loading_text('0')
         pag.display.flip()
 
@@ -164,102 +164,102 @@ class BrickBricker(Botons_functions):
         # Textos y Botones
 
                                                 # Del proceso principal
-        self.life_text = Create_text('lives', 30, self.fuente_orbi_medium, (70,40),  'center')
-        self.score_text = Create_text('Score 0', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx - 60,40), self.ventana)
-        self.lvl_text = Create_text('lvl 1 ', 30, self.fuente_orbi_medium, (self.ventana_rect.w ,40),  'right')
+        self.life_text = Text('lives', 30, self.fuente_orbi_medium, (70,40),  'center')
+        self.score_text = Text('Score 0', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx - 60,40), self.ventana)
+        self.lvl_text = Text('lvl 1 ', 30, self.fuente_orbi_medium, (self.ventana_rect.w ,40),  'right')
 
-        self.a_reiniciar = Create_text('Se ha Bugueado :V\nDebes reiniciar con "R"', 50, self.fuente_orbi_extrabold, self.ventana_rect.center)
+        self.a_reiniciar = Text('Se ha Bugueado :V\nDebes reiniciar con "R"', 50, self.fuente_orbi_extrabold, self.ventana_rect.center)
 
-        self.text_press_space = Create_text('Presiona espacio para comenzar', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3), self.ventana)
-        self.text_game_over = Create_text('Game over', 50, self.fuente_orbi_extrabold, self.ventana_rect.center,  with_rect=True, border_radius=20)
-        self.boton_game_over = Create_boton('Restart', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
-        self.text_win = Create_text('You Win', 50, self.fuente_orbi_extrabold, self.ventana_rect.center,  with_rect=True, border_radius=20)
-        self.boton_win = Create_boton('Next lvl', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
+        self.text_press_space = Text('Presiona espacio para comenzar', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3), self.ventana)
+        self.text_game_over = Text('Game over', 50, self.fuente_orbi_extrabold, self.ventana_rect.center,  with_rect=True, border_radius=20)
+        self.boton_game_over = Button('Restart', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
+        self.text_win = Text('You Win', 50, self.fuente_orbi_extrabold, self.ventana_rect.center,  with_rect=True, border_radius=20)
+        self.boton_win = Button('Next lvl', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
         self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)), self.ventana, 20)
 
-        self.text_ganaste=Create_text('Haz Ganado el juego\nGracias por jugar',40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
+        self.text_ganaste=Text('Haz Ganado el juego\nGracias por jugar',40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
 
         self.loading_text(14)
                                                 # De la pantalla de titulo
-        self.title_text = Create_text('BrickBricker', 50, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
-        self.boton_reanudar = Create_boton('Reanudar', 35, self.fuente_orbi_medium, (-500,-500),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=self.func_reanudar)
-        self.boton_jugar = Create_boton('Jugar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.0),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_jugar)
-        self.boton_fan_lvls = Create_boton('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fan_lvls_title)
-        self.options_text_title = Create_boton('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_opciones)
-        self.salir_text_title = Create_boton('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1)
+        self.title_text = Text('BrickBricker', 50, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5), self.ventana)
+        self.boton_reanudar = Button('Reanudar', 35, self.fuente_orbi_medium, (-500,-500),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=self.func_reanudar)
+        self.boton_jugar = Button('Jugar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.0),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_jugar)
+        self.boton_fan_lvls = Button('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fan_lvls_title)
+        self.options_text_title = Button('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_opciones)
+        self.salir_text_title = Button('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1)
         self.salir_text_title.smothmove(60, 1, 0.73, 2)
-        self.boton_extras = Create_boton('', 40, self.fuente_simbolos, (0,self.ventana_rect.h-20),  dire='left', color='white', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_extras)
+        self.boton_extras = Button('', 40, self.fuente_simbolos, (0,self.ventana_rect.h-20),  dire='left', color='white', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_extras)
         
 
                                                 # Del menu de opciones
-        self.title_dificult = Create_text('Dificultad', 40, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .9), border_width=-1)
-        self.title_easy = Create_boton('Fácil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_change_difficult(1))
-        self.title_medium = Create_boton('Medio', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.13),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_change_difficult(2))
-        self.title_hard = Create_boton('Difícil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.26),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=lambda:self.func_change_difficult(3))
-        self.button_load_music = Create_boton('Cargar musica', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.38),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_drop_music_file())
+        self.title_dificult = Text('Dificultad', 40, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .9), border_width=-1)
+        self.title_easy = Button('Fácil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_change_difficult(1))
+        self.title_medium = Button('Medio', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.13),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_change_difficult(2))
+        self.title_hard = Button('Difícil', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.26),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=lambda:self.func_change_difficult(3))
+        self.button_load_music = Button('Cargar musica', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.38),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda:self.func_drop_music_file())
 
 
-        self.text_low_detail_mode = Create_boton('Low Detail Mode: X', 20, self.fuente_orbi_medium, (0,self.ventana_rect.h),  35, 'bottomleft', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func= self.func_low_detail_mode)
-        self.button_toggle_fullscreen = Create_boton('', 30, self.fuente_simbolos, (30,self.text_low_detail_mode.rect.top-10),  0, 'bottomleft', 'white', border_radius=10_000, border_color='white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fullscreen)
-        self.button_del_progress = Create_boton('Borrar Progreso actual', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.50),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda: self.GUI_admin.add(GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el progreso?'), self.func_del_progress))
+        self.text_low_detail_mode = Button('Low Detail Mode: X', 20, self.fuente_orbi_medium, (0,self.ventana_rect.h),  35, 'bottomleft', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func= self.func_low_detail_mode)
+        self.button_toggle_fullscreen = Button('', 30, self.fuente_simbolos, (30,self.text_low_detail_mode.rect.top-10),  0, 'bottomleft', 'white', border_radius=10_000, border_color='white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fullscreen)
+        self.button_del_progress = Button('Borrar Progreso actual', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.50),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda: self.GUI_admin.add(GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el progreso?'), self.func_del_progress))
 
-        self.lista_canciones=List_Box((220,500),(580,20), None,smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
+        self.lista_canciones=List((220,500),(580,20), None,smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
 
 
                                                 # De la pausa
-        self.pausa_text = Create_text('Pausado', 50, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .8),  'center', border_radius=10, with_rect=True)
-        self.pausa_text_X = Create_boton('Salir', 40, self.fuente_orbi_extrabold, (self.ventana_rect.w - 20,20), 20, 'topright', 'white', with_rect=True,color_rect='black', border_radius=40,func=self.func_pause_X)
+        self.pausa_text = Text('Pausado', 50, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .8),  'center', border_radius=10, with_rect=True)
+        self.pausa_text_X = Button('Salir', 40, self.fuente_orbi_extrabold, (self.ventana_rect.w - 20,20), 20, 'topright', 'white', with_rect=True,color_rect='black', border_radius=40,func=self.func_pause_X)
 
         self.loading_text(28)
 
 
                                                 # La pantalla de niveles creados
-        self.text_created_lvls = Create_text('Created lvls', 40, self.fuente_orbi_medium, (self.ventana_rect.centerx, 10),  'top')
-        self.boton_seleccionar = Create_boton('Seleccionar',24,None,(430,107),10,'topleft','black',border_radius=0, border_width=-1, func=self.select_lvl)
-        self.boton_borrar = Create_boton('Eliminar',24,None,(640,107),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, func=self.borrar_lvl)
+        self.text_created_lvls = Text('Created lvls', 40, self.fuente_orbi_medium, (self.ventana_rect.centerx, 10),  'top')
+        self.boton_seleccionar = Button('Seleccionar',24,None,(430,107),10,'topleft','black',border_radius=0, border_width=-1, func=self.select_lvl)
+        self.boton_borrar = Button('Eliminar',24,None,(640,107),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, func=self.borrar_lvl)
         self.lista_fans_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
             (self.ventana_rect.width*.1, self.ventana_rect.height*.15), 2, None, 30, 5, padding_left=13, header_text=['Id','Nombre'], 
             colums_witdh=[0,.10], border_color=(20,20,20), background_color=(1,1,1)) # (self.ventana_rect.width*.1, self.ventana_rect.height*.15)
         
         # Para niveles web
-        self.boton_seleccionar_web = Create_boton('Seleccionar',24,None,(self.ventana_rect.w+430,107),10,'topleft','black',border_radius=0, border_width=-1, func=self.select_lvl_web)
-        self.boton_borrar_web = Create_boton('Eliminar',24,None,(self.ventana_rect.w+640,107),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, func=self.borrar_lvl_web)
+        self.boton_seleccionar_web = Button('Seleccionar',24,None,(self.ventana_rect.w+430,107),10,'topleft','black',border_radius=0, border_width=-1, func=self.select_lvl_web)
+        self.boton_borrar_web = Button('Eliminar',24,None,(self.ventana_rect.w+640,107),10,'topleft','black',border_top_right_radius=10,border_radius=0, border_width=-1, func=self.borrar_lvl_web)
         self.lista_web_lvls: Multi_list= Multi_list((self.ventana_rect.width*.8, self.ventana_rect.height*.8), 
             (self.ventana_rect.width*1.1, self.ventana_rect.height*.15), 3, None, 30, padding_left=13, header_text=['Web_id','Nombre', ''], 
             colums_witdh=[0,.15, .5], border_color=(20,20,20), fonts=[None, None, self.fuente_simbolos], default=['-','-',''])
         
-        self.boton_custom_lvls = Create_boton('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= self.func_load_custom_lvls)
-        self.boton_web_lvls = Create_boton('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= self.func_see_web_lvls)
-        self.boton_reload_web_lvls = Create_boton('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.start('cargar niveles'))
+        self.boton_custom_lvls = Button('custom_lvls', 20,self.fuente_orbi_medium, (-200,0), dire='topleft', func= self.func_load_custom_lvls)
+        self.boton_web_lvls = Button('web_lvls', 20,self.fuente_orbi_medium, (0,0), dire='topleft', func= self.func_see_web_lvls)
+        self.boton_reload_web_lvls = Button('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.start('cargar niveles'))
         l = [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]
         for x in l:
             x.smothmove(60, 1, .9, 1) 
 
-        self.text_buscando_niveles: Create_text = Create_text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
+        self.text_buscando_niveles: Text = Text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
         self.text_buscando_niveles.smothmove(60, 2, .7, 1)
 
 
                                                 # Del menu de extras
-        self.extras_nombre = Create_text('Created\nby\nEdouard Sandoval', 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
-        self.extras_version = Create_text('Version 1.9.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
-        self.social_media_github_button = Create_boton('',30,self.fuente_simbolos, (10,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://github.com/Tecrato'))
-        self.social_media_youtube_button = Create_boton('輸',30,self.fuente_simbolos, (70,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://youtube.com/channel/UCeMfUcvDXDw2TPh-b7UO1Rw'))
+        self.extras_nombre = Text('Created\nby\nEdouard Sandoval', 45, self.fuente_orbi_extrabold, (self.ventana_rect.centerx,self.ventana_rect.centery * .5))
+        self.extras_version = Text('Version 1.9.1',30,self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery))
+        self.social_media_github_button = Button('',30,self.fuente_simbolos, (10,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://github.com/Tecrato'))
+        self.social_media_youtube_button = Button('輸',30,self.fuente_simbolos, (70,self.ventana_rect.h -10), 20, 'bottomleft', func=lambda: startfile('http://youtube.com/channel/UCeMfUcvDXDw2TPh-b7UO1Rw'))
 
         # Musica
-        self.boton_musica_musica = Create_text('♫', 40, self.fuente_consolas, (25,40),  padding=(20,0), with_rect=True)
-        self.text_song = Create_text('\"Song\"', 20, self.fuente_consolas, (40,40),  'left', 'white', True, (0,0,0,255))
-        self.boton_next_musica = Create_boton('', 20, self.fuente_simbolos, (self.ventana_rect.w-20,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=self.func_music_next)
-        self.boton_pause_musica = Create_boton('', 20, self.fuente_simbolos, (self.ventana_rect.w-50,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_pause)
-        self.boton_retry_musica = Create_boton('', 20, self.fuente_simbolos, (self.ventana_rect.w-80,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_retry)
-        self.boton_random_musica = Create_boton('列', 20, self.fuente_simbolos, (self.ventana_rect.w-110,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_random)
+        self.boton_musica_musica = Text('♫', 40, self.fuente_consolas, (25,40),  padding=(20,0), with_rect=True)
+        self.text_song = Text('\"Song\"', 20, self.fuente_consolas, (40,40),  'left', 'white', True, (0,0,0,255))
+        self.boton_next_musica = Button('', 20, self.fuente_simbolos, (self.ventana_rect.w-20,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=self.func_music_next)
+        self.boton_pause_musica = Button('', 20, self.fuente_simbolos, (self.ventana_rect.w-50,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_pause)
+        self.boton_retry_musica = Button('', 20, self.fuente_simbolos, (self.ventana_rect.w-80,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_retry)
+        self.boton_random_musica = Button('列', 20, self.fuente_simbolos, (self.ventana_rect.w-110,self.ventana_rect.h - 120 - 30),  10, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_music_random)
 
         self.BV_Volumen_Musica = Barra_de_progreso((self.ventana_rect.w - 30, self.ventana_rect.h - 30), [15,100])
         self.BV_Volumen_Musica_press = False
-        self.text_musica_vertical = Create_text('M\nu\ns\ni\nc', 20, self.fuente_consolas, (self.ventana_rect.w-50,self.ventana_rect.h - 120))
+        self.text_musica_vertical = Text('M\nu\ns\ni\nc', 20, self.fuente_consolas, (self.ventana_rect.w-50,self.ventana_rect.h - 120))
 
         self.BV_Volumen_Sonidos = Barra_de_progreso((self.ventana_rect.w - 80, self.ventana_rect.h - 30), [15,100])
         self.BV_Volumen_Sonidos_press = False
-        self.text_sonido_vertical = Create_text('S\no\nu\nn\nd', 20, self.fuente_consolas, (self.ventana_rect.w-100,self.ventana_rect.h - 120))
+        self.text_sonido_vertical = Text('S\no\nu\nn\nd', 20, self.fuente_consolas, (self.ventana_rect.w-100,self.ventana_rect.h - 120))
 
         self.loading_text(42)
 
@@ -362,7 +362,7 @@ class BrickBricker(Botons_functions):
 
         #El volumen de los sonidos
         self.json.setdefault("sound_volumen",.5)
-        self.BV_Volumen_Sonidos.set_volumen(self.json["sound_volumen"])
+        self.BV_Volumen_Sonidos.volumen = self.json["sound_volumen"]
         self.sounds.set_volumen(self.json["sound_volumen"])
 
         # El nivel de dificultad
@@ -384,12 +384,12 @@ class BrickBricker(Botons_functions):
         if choque == 0:
             self.ball.set_pos(Vector2(self.ball.pos[0]-self.ball.vel[0],self.player.rect2.top - 5))
             angle = Angulo(self.player.rect.center, self.ball.rect.center)
-            self.ball.set_vel([numpy.cos(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0), self.ball.vel)])
+            self.ball.set_vel([math.cos(math.radians(angle))*Hipotenuza((0,0), self.ball.vel),math.sin(math.radians(angle))*Hipotenuza((0,0), self.ball.vel)])
             self.mulpliquer = 0
             self.bugueado = 0
             if not self.low_detail_mode:
                 for x in range(15):
-                    self.sparks.append(Spark(self.ventana, (self.ball.rect.centerx,650), numpy.radians(numpy.random.randint(230, 340)),numpy.random.randint(1, 4),(255, 255, 255),.6))
+                    self.sparks.append(Spark(self.ventana, (self.ball.rect.centerx,650), math.radians(random.randint(230, 340)),random.randint(1, 4),(255, 255, 255),.6))
         elif choque > 0:
             if choque == 4:
                 self.life -= 1
@@ -410,7 +410,7 @@ class BrickBricker(Botons_functions):
                 
             if self.bloques[choque]['border_radius'] == 10000:
                 angle = Angulo(self.bloques[choque]['rect'].center, self.ball.rect.center)
-                self.ball.set_vel(Vector2(numpy.cos(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel),numpy.sin(numpy.radians(angle))*Hipotenuza((0,0),self.ball.vel)))
+                self.ball.set_vel(Vector2(math.cos(math.radians(angle))*Hipotenuza((0,0),self.ball.vel),math.sin(math.radians(angle))*Hipotenuza((0,0),self.ball.vel)))
             else:
                 if (self.ball.rect.centerx < self.bloques[choque]['rect'].left and self.ball.vel[0] > 0) or \
                     (self.ball.rect.centerx > self.bloques[choque]['rect'].right and self.ball.vel[0] < 0):
@@ -497,7 +497,7 @@ class BrickBricker(Botons_functions):
         self.bloques.append({'rect': self.limite_inferior, 'effect': 1, 'color': 'red', 'border_radius': 0, 'power':0})
         if lvl == 1:
             for x in range(3,10):
-                self.bloques.append({'rect': pag.rect.Rect(52*x + 80,22*6 + 100, 50, 20), 'effect': 2, 'color': (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255), 'border_radius': 0, 'power':0})
+                self.bloques.append({'rect': pag.rect.Rect(52*x + 80,22*6 + 100, 50, 20), 'effect': 2, 'color': (random.random()*255,random.random()*255,random.random()*255), 'border_radius': 0, 'power':0})
         elif lvl == 2:
             lvl_map = [
                 [1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ],
@@ -513,13 +513,13 @@ class BrickBricker(Botons_functions):
             ]
 
             for y in range(len(lvl_map)):
-                color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
+                color = (random.random()*255,random.random()*255,random.random()*255)
                 for x in range(len(lvl_map[y])):
                     if lvl_map[y][x] == 9:
                         self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * y + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         elif lvl == 3:
             for y in range(5):
-                color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
+                color = (random.random()*255,random.random()*255,random.random()*255)
                 for x in range(10):
                     self.bloques.append({'rect': pag.rect.Rect(62 * x + 80,50 * y + 100, 60, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         elif lvl == 4:
@@ -535,7 +535,7 @@ class BrickBricker(Botons_functions):
         elif lvl == 9:
             bloques = self.lvl_manager.search_lvl_blocks(6)
         else:
-            color = (numpy.random.random()*255,numpy.random.random()*255,numpy.random.random()*255)
+            color = (random.random()*255,random.random()*255,random.random()*255)
             for x in range(3,10):
                 self.bloques.append({'rect': pag.rect.Rect(52 * x + 80,22 * 6 + 100, 50, 20), 'effect': 2, 'color': color, 'border_radius': 0, 'power':0})
         
@@ -585,7 +585,7 @@ class BrickBricker(Botons_functions):
         else:
             bloques = self.lvl_manager.search_custom_lvl_blocks(self.lvl_fan)
         
-        self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': (numpy.random.randint(1,6) if numpy.random.randint(0,10000) < 1000 else 7) if b[8] != 0 else b[8], 'color': (b[10],b[11],b[12])} for b in bloques]
+        self.bloques += [{'rect': pag.Rect(b[2],b[3],b[4],b[5]), 'effect': b[6], 'border_radius': b[7], 'power': (random.randint(1,6) if random.randint(0,10000) < 1000 else 7) if b[8] != 0 else b[8], 'color': (b[10],b[11],b[12])} for b in bloques]
         
         self.update_bloques_rects()
 
@@ -769,10 +769,13 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.update()
                 self.Serpiente.draw()
 
-            for x in self.texts_title_list:
+            for x in [*self.texts_title_list,*self.botones_title_list]:
+                x.update()
                 x.draw(self.ventana)
-            for x in self.botones_title_list:
-                x.draw(self.ventana)
+            # for x in self.texts_title_list:
+            #     x.draw(self.ventana)
+            # for x in self.botones_title_list:
+            #     x.draw(self.ventana)
             
 
             pag.display.flip()
@@ -852,10 +855,13 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.update()
                 self.Serpiente.draw()
 
-            for x in self.texts_options_list:
+            for x in [*self.texts_options_list,*self.botones_options_list]:
+                x.update()
                 x.draw(self.ventana)
-            for x in self.botones_options_list:
-                x.draw(self.ventana)
+            # for x in self.texts_options_list:
+            #     x.draw(self.ventana)
+            # for x in self.botones_options_list:
+            #     x.draw(self.ventana)
 
             pag.draw.circle(self.ventana, 'white', self.button_toggle_fullscreen.rect.center, 27, 4)
                 
@@ -925,8 +931,11 @@ class BrickBricker(Botons_functions):
                     self.float_texts_list.pop(i)
                 text.draw()
 
-            [x.draw(self.ventana) for x in self.texts_pause_list]
-            [x.draw(self.ventana) for x in self.botones_pause_list]
+            for x in [*self.texts_pause_list,*self.botones_pause_list]:
+                x.update()
+                x.draw(self.ventana)
+            # [x.draw(self.ventana) for x in self.texts_pause_list]
+            # [x.draw(self.ventana) for x in ]
 
             if self.pausado == True:
                 pag.display.flip()
@@ -1070,7 +1079,9 @@ class BrickBricker(Botons_functions):
                 self.text_game_over.draw(self.ventana)
                 self.boton_game_over.draw(self.ventana)
         
-            [x.draw(self.ventana) for x in self.texts_main_list]
+            for x in self.texts_main_list:
+                x.update()
+                x.draw(self.ventana)
 
             for i, spark in sorted(enumerate(self.sparks), reverse=True):
                 spark.move(self.deltatime.dt)
@@ -1097,7 +1108,8 @@ class BrickBricker(Botons_functions):
                 text.draw()
 
 
-            if self.lvl > 9:self.text_ganaste.draw(self.ventana)
+            if self.lvl > 9:
+                self.text_ganaste.draw(self.ventana)
 
             pag.display.flip()
             self.relog.tick(self.framerate_general)

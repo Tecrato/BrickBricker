@@ -1,5 +1,5 @@
-import pygame as pag, time
-from numpy import random,cos,sin,radians,pi
+import pygame as pag, time, random
+from math import cos,sin,radians,pi
 class Background:
 	def __init__(self,surface,size, type = 1) -> None:
 		self.surface = surface

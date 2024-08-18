@@ -1,5 +1,5 @@
 import pygame as pag
-from numpy import sin,radians
+from math import sin,radians
 from pygame.surface import Surface
 
 

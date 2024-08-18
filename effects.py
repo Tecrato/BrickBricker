@@ -1,5 +1,5 @@
-import pygame as pag
-from numpy import random,sin,cos,radians
+import pygame as pag, random
+from math import sin,cos,radians
 
 
 from Utilidades.particles import Particles

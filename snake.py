@@ -1,5 +1,5 @@
 from pygame import draw, rect 
-from numpy import random
+import random
 from Utilidades.Animaciones import *
 from Utilidades.particles import Particles
 class Snake:
