@@ -1,10 +1,9 @@
-import pygame as pag, math, json, random
+import pygame as pag, math, json, random, time
 from os import mkdir, path, startfile
 from pygame.locals import *
 from sys import exit as ex
 from io import open
 from platformdirs import user_data_dir
-from Utilidades import *
 from pygame import Vector2
 
 
@@ -20,8 +19,11 @@ from snake import Snake
 from sound import Set_sounds
 
 from lvl_manager import Lvl_manager
-from Utilidades import GUI
-from Utilidades import Funcs_pool
+
+from Utilidades import Curva_de_Bezier, Deltatime, Angulo, Hipotenuza, Funcs_pool
+from Utilidades_pygame import GUI
+from Utilidades_pygame import Text, Button, List, Multi_list, Barra_de_progreso, Spark
+from Utilidades_pygame.particles import Particles
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
 
@@ -85,11 +87,16 @@ class BrickBricker(Botons_functions):
         self.framerate_dificultad = 90
         
         # Fuentes
-        self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
-        self.fuente_orbi_medium = 'Assets/Fuentes/Orbitron-Medium.ttf'
-        self.fuente_orbi_extrabold = 'Assets/Fuentes/Orbitron-ExtraBold.ttf'
-        self.fuente_consolas = 'Assets/Fuentes/consola.ttf'
-        self.fuente_simbolos = 'Assets/Fuentes/Symbols.ttf'
+        self.fuente_nerd_mono = 'C:/Users/Edouard/Documents/fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
+        # self.fuente_nerd_mono = 'Assets/Fuentes/mononoki Bold Nerd Font Complete Mono.ttf'
+        self.fuente_orbi_medium = 'C:/Users/Edouard/Documents/fuentes/Orbitron-Medium.ttf'
+        # self.fuente_orbi_medium = 'Assets/Fuentes/Orbitron-Medium.ttf'
+        self.fuente_orbi_extrabold = 'C:/Users/Edouard/Documents/fuentes/Orbitron-ExtraBold.ttf'
+        # self.fuente_orbi_extrabold = 'Assets/Fuentes/Orbitron-ExtraBold.ttf'
+        self.fuente_consolas = 'C:/Users/Edouard/Documents/fuentes/consola.ttf'
+        # self.fuente_consolas = 'Assets/Fuentes/consola.ttf'
+        self.fuente_simbolos = 'C:/Users/Edouard/Documents/fuentes/Symbols.ttf'
+        # self.fuente_simbolos = 'Assets/Fuentes/Symbols.ttf'
 
         self.txt = Text('Cargando 0%\nCargando',50,None,(400,350),color='white',padding=100,with_rect=True,color_rect='black')
         self.loading_text('0')
@@ -151,7 +158,12 @@ class BrickBricker(Botons_functions):
 
         # Aun mas cosas
         self.Serpiente = Snake(self.ventana)
-        self.particles_ball = Particles(self.ventana, 2, radius=7,degrad_vel=.2)
+        # self.particles_ball = Particles(self.ventana, 2, radius=7,degrad_vel=.2)
+        self.particles_ball = Particles(
+            spawn_pos=(0,0), radio=15, color=(255,255,255), velocity=0, direccion=(1,0), radio_down=.5,
+            time_between_spawns=.01, max_distance=1000, spawn_count=1, max_particles=100
+        )
+        self.last_ball_pos = (0,0)
         self.background = Background(self.ventana,(800,700),2)
         self.background2 = Background(self.ventana,(800,700),3)
         self.deltatime = Deltatime(90)
@@ -203,7 +215,7 @@ class BrickBricker(Botons_functions):
         self.button_toggle_fullscreen = Button('', 30, self.fuente_simbolos, (30,self.text_low_detail_mode.rect.top-10),  0, 'bottomleft', 'white', border_radius=10_000, border_color='white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fullscreen)
         self.button_del_progress = Button('Borrar Progreso actual', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.50),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1, func=lambda: self.GUI_admin.add(GUI.Desicion(self.ventana_rect.center, 'Confirmacion', 'Desea eliminar permanentemente el progreso?'), self.func_del_progress))
 
-        self.lista_canciones=List((220,500),(580,20), None,smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
+        self.lista_canciones=List((220,500),(580,20), [None],smothscroll= True,background_color='black',padding_left= 0,padding_top=0,header=True, text_header='Canciones', header_top_left_radius=0, header_top_right_radius=0)
 
 
                                                 # De la pausa
@@ -336,7 +348,7 @@ class BrickBricker(Botons_functions):
             p = self.music_var.load_music(self.json["music_dir"])
             self.text_song.text = p['text']
             if len(self.music_var.canciones) > 0:
-                self.lista_canciones.change_list(self.music_var.canciones)
+                self.lista_canciones.lista_palabras = self.music_var.canciones
                 self.lista_canciones.select(index=p['index'])
 
 
@@ -634,7 +646,6 @@ class BrickBricker(Botons_functions):
         self.bugueado = 0
         self.powers.clear()
         self.particles_ball.clear()
-        self.particles_ball.con = 0
         self.float_texts_list.clear()
         self.deltatime.FPS = self.framerate_dificultad
         self.deltatime_ball.FPS = self.framerate_dificultad
@@ -919,7 +930,8 @@ class BrickBricker(Botons_functions):
 
             if self.alive and self.playing:
                 self.ball.draw()
-                self.particles_ball.draw()
+                self.particles_ball.spawn_pos = self.ball.pos
+                self.particles_ball.draw(self.ventana)
 
             for i,p in sorted(enumerate(self.powers),reverse= True):
                 p.draw()
@@ -1042,20 +1054,11 @@ class BrickBricker(Botons_functions):
 
             self.draw_effects(self.effects_before)
 
-            if not self.low_detail_mode:
-                self.particles_ball.update(self.ball.pos)
-                self.particles_ball.draw()
-
-            for alala in self.bloques[1:]:
-                pag.draw.rect(self.ventana, alala['color'], alala['rect'], border_radius= alala['border_radius'])
-
-            if not self.low_detail_mode:
-                self.player.draw2()
-            self.player.draw()
-
-            if self.ball.rect.left>self.ventana_rect.w or self.ball.rect.top>self.ventana_rect.h or self.ball.rect.right<0 or self.ball.rect.bottom<0:
-                self.bugueado = 0
-                self.a_reiniciar.draw(self.ventana)
+            if not self.low_detail_mode and self.ball.pos != self.last_ball_pos:
+                self.particles_ball.spawn_pos = self.ball.pos
+                self.particles_ball.update()
+                self.particles_ball.draw(self.ventana)
+                self.last_ball_pos = self.ball.pos
 
             if len(self.bloques) == 5:
                 if not self.win:
@@ -1064,7 +1067,9 @@ class BrickBricker(Botons_functions):
                 self.text_win.draw(self.ventana)
                 self.boton_win.draw(self.ventana)
                 if self.efecto_win.update():
-                    self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)),self.ventana, 50)
+                    # self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)),self.ventana, 20)
+                    self.efecto_win.fr['coords'] = (random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50))
+                    self.efecto_win.reset()
                 
                 self.efecto_win.draw()
             elif self.alive:
@@ -1079,6 +1084,17 @@ class BrickBricker(Botons_functions):
                 self.text_game_over.draw(self.ventana)
                 self.boton_game_over.draw(self.ventana)
         
+            for alala in self.bloques[1:]:
+                pag.draw.rect(self.ventana, alala['color'], alala['rect'], border_radius= alala['border_radius'])
+
+            if not self.low_detail_mode:
+                self.player.draw2()
+            self.player.draw()
+
+            if self.ball.rect.left>self.ventana_rect.w or self.ball.rect.top>self.ventana_rect.h or self.ball.rect.right<0 or self.ball.rect.bottom<0:
+                self.bugueado = 0
+                self.a_reiniciar.draw(self.ventana)
+
             for x in self.texts_main_list:
                 x.update()
                 x.draw(self.ventana)

@@ -12,20 +12,20 @@ class Background:
 			self.scroll = -150
 			self.surface2.fill((0,0,0))
 			for x in range(0,11):
-				polygon = [
-					[0,                 (self.size[1]/10+200)+ (200*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10) + (200*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10+50) + (200*x) + self.scroll],
-					[0,                 (self.size[1]/10+250) + (200*x) + self.scroll],
-				]
+				polygon = (
+					(0,                 (self.size[1]/10+200)+ (200*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10) + (200*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10+50) + (200*x) + self.scroll),
+					(0,                 (self.size[1]/10+250) + (200*x) + self.scroll),
+				)
 				pag.draw.polygon(self.surface2,(20,60,20), polygon)
 				pag.draw.polygon(self.surface2,'black', polygon, 5)
-				polygon = [
-					[0,                 (self.size[1]/10) + (200*x) + self.scroll],
-					[0,                 (self.size[1]/10+50) + (200*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10+250) + (200*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10+200) + (200*x) + self.scroll],
-				]
+				polygon = (
+					(0,                 (self.size[1]/10) + (200*x) + self.scroll),
+					(0,                 (self.size[1]/10+50) + (200*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10+250) + (200*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10+200) + (200*x) + self.scroll),
+				)
 				pag.draw.polygon(self.surface2,(20,60,20), polygon)
 				pag.draw.polygon(self.surface2,'black', polygon, 5)
 		elif self.type == 3:
@@ -38,12 +38,12 @@ class Background:
 			self.scroll -= .5
 			if self.scroll <= -240: self.scroll = -120
 			for x in range(11):
-				polygon = [
-					[0,                 (self.size[1]/10+100)+ (120*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10) + (120*x) + self.scroll],
-					[self.size[0],      (self.size[0]/10+50) + (120*x) + self.scroll],
-					[0,                 (self.size[1]/10+150) + (120*x) + self.scroll],
-				]
+				polygon = (
+					(0,                 (self.size[1]/10+100)+ (120*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10) + (120*x) + self.scroll),
+					(self.size[0],      (self.size[0]/10+50) + (120*x) + self.scroll),
+					(0,                 (self.size[1]/10+150) + (120*x) + self.scroll),
+				)
 				pag.draw.polygon(self.surface2,(20,60,20), polygon)
 				pag.draw.polygon(self.surface2,'black', polygon, 5)
 			self.surface.blit(self.surface2,(0,0))

@@ -1,7 +1,7 @@
 import pygame as pag, requests
 
 from lvl_manager import Lvl_manager
-from Utilidades import GUI
+from Utilidades_pygame import GUI
 
 class Botons_functions:
     def check_web_lvls_list(self, lista):

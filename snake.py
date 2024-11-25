@@ -1,13 +1,21 @@
 from pygame import draw, rect 
 import random
-from Utilidades.Animaciones import *
-from Utilidades.particles import Particles
+
+from Utilidades import Hipotenuza
+from Utilidades_pygame.Animaciones import *
+# from Utilidades_pygame.particles import Particles
+from Utilidades_pygame.particles import Particles
 class Snake:
     def __init__(self, surface) -> None:
         self.surface = surface
         self.surface_rect = self.surface.get_rect()
 
-        self.particles = Particles(self.surface, radius=10)
+        # self.particles = Particles(self.surface, radius=10)
+        self.particles = Particles(
+            spawn_pos=(0,0), radio=20, color=(255,255,255), velocity=.1, direccion=(1,0), radio_down=.05,
+            vel_dispersion=.5, angle_dispersion=30, radio_dispersion=10, max_particles=100, time_between_spawns=.01,
+            max_distance=1000, spawn_count=1
+            )
         self.reset()
 
 
@@ -23,7 +31,10 @@ class Snake:
         self.cuerpo4.center = self.movimiento5.update(self.cuerpo3.center)
         self.cuerpo5.center = self.movimiento6.update(self.cuerpo4.center)
 
-        self.particles.update(self.cuerpo1.center, self.Cabeza.center)
+        self.particles.spawn_pos = self.cuerpo1.center
+        self.particles.velocity = Hipotenuza((0,0),Vector2(self.cuerpo1.center) - Vector2(self.Cabeza.center))/10
+        self.particles.direccion = Vector2(Vector2(self.cuerpo1.center) - Vector2(self.Cabeza.center)).normalize()
+        self.particles.update(dt=1)
 
     def reset(self) -> None:
 
@@ -52,7 +63,7 @@ class Snake:
         # self.particles = Particles(self.surface)
 
     def draw(self) -> None:
-        self.particles.draw()
+        self.particles.draw(self.surface)
         draw.rect(self.surface, (182,220,29), self.cuerpo5, border_radius=25)
         draw.rect(self.surface, (10,146,16), self.cuerpo5, 5, border_radius=25)
 

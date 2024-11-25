@@ -2,7 +2,7 @@ import pygame as pag, random
 from math import sin,cos,radians
 
 
-from Utilidades.particles import Particles
+from Utilidades_pygame.particles import Particles
 
 
 class Effect:
