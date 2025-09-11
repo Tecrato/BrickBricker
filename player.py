@@ -2,7 +2,7 @@ from pygame import rect, draw
 from pygame.surface import Surface
 
 
-from Utilidades.Animaciones import Second_Order_Dinamics
+from Utilidades_pygame.Animaciones import Second_Order_Dinamics
 
 class Player:
     def __init__(self, pos: tuple, size: int, vel: float, surface: Surface, limits: tuple) -> None:

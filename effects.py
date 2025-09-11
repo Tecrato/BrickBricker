@@ -34,13 +34,18 @@ class Effect:
             self.down = False
         elif type == 3:
             # Esto es para la pantalla de win
-            self.particles = []
-            for i in range(1,16):
-                self.particles.append(Particles(self.surface,3,False,size,3,0,
-                    self.coord,
-                    (sin(radians(24*i))*3,cos(radians(24*i))*3),
-                    (255, 255, 0, 255), (random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255))))
-                # print(sin(radians(24*i))*3,cos(radians(24*i))*3)
+            self.particles = Particles(
+                        spawn_pos = self.coord,
+                        color = (random.randint(0,255),random.randint(0,255),random.randint(0,255),random.randint(0,255)),
+                        radio = size,
+                        velocity = 2.5,
+                        angle = 0,
+                        random_color=True,
+                        radio_down= .5,
+                        angle_dispersion= 180,
+                        spawn_count= 20,
+                        time_between_spawns= 2
+                    )
                 
         elif self.type == 4:
             self.nose = .05
@@ -78,9 +83,8 @@ class Effect:
                 self.size_grade *= 1.013
                 self.color_grade *= 0.91
         elif self.type == 3:
-            for particles in self.particles:
-                if particles.update(dt=dt):
-                    return True
+            if self.particles.update(dt=dt):
+                return True
         elif self.type == 4:
             self.color_grade += self.nose
             if self.color_grade >= 1:
@@ -106,8 +110,7 @@ class Effect:
             pag.draw.circle(self.surface, (int(255*self.color_grade),int(255*self.color_grade),0), self.coord, round(self.circle_size * self.size_grade/1.6), 3)
             pag.draw.circle(self.surface, (int(255*self.color_grade),int(255*self.color_grade),0), self.coord, round(self.circle_size * self.size_grade/2.5), 5)
         elif self.type == 3:
-            for particles in self.particles:
-                particles.draw()
+            self.particles.draw(self.surface)
         elif self.type == 4:
             self.surface.blit(self.surf,(0,0), special_flags= pag.BLEND_RGB_ADD)
         elif self.type == 5:

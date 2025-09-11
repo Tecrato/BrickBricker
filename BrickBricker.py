@@ -1,7 +1,8 @@
 import pygame as pag, math, json, random, time
-from os import mkdir, path, startfile
+from os import mkdir, path, startfile, chdir
 from pygame.locals import *
 from sys import exit as ex
+from pathlib import Path
 from io import open
 from platformdirs import user_data_dir
 from pygame import Vector2
@@ -24,6 +25,8 @@ from Utilidades import Curva_de_Bezier, Deltatime, Angulo, Hipotenuza, Funcs_poo
 from Utilidades_pygame import GUI
 from Utilidades_pygame import Text, Button, List, Multi_list, Barra_de_progreso, Spark
 from Utilidades_pygame.particles import Particles
+
+chdir(Path(__file__).parent)
 
 appdata = user_data_dir('save', 'BrickBreacker', roaming=True)
 
@@ -64,7 +67,7 @@ class BrickBricker(Botons_functions):
         self.effects_before = []
         self.float_texts_list = []
         self.powers = []
-        self.sparks = []
+        self.sparks: Spark = []
 
         # Muchas verdades y falsedades
         self.acercandose: bool = False
@@ -123,9 +126,6 @@ class BrickBricker(Botons_functions):
 
 
     def inilializar_juego(self) -> None:
-
-        GUI.configs['fuente_simbolos'] = self.fuente_simbolos
-
         # Base de datos
         self.DB_path_name = appdata+'/'+'lvls.sqlite3'
         self.lvl_manager = Lvl_manager(self.DB_path_name)
@@ -142,9 +142,6 @@ class BrickBricker(Botons_functions):
         # Bola
         self.ball = Ball((self.ventana_rect.centerx,self.ventana_rect.centery * 1.7), 10, self.ventana, [0,0])
 
-        # Ventanas emergentes
-        self.GUI_admin = GUI.GUI_admin()
-
         # Limites 
         self.limite_inferior = pag.rect.Rect(0, self.ventana_rect.height-15, self.ventana_rect.width, 50)
         self.limite_superior = pag.rect.Rect(-50, -47, self.ventana_rect.width+150, 50)
@@ -160,9 +157,10 @@ class BrickBricker(Botons_functions):
         self.Serpiente = Snake(self.ventana)
         # self.particles_ball = Particles(self.ventana, 2, radius=7,degrad_vel=.2)
         self.particles_ball = Particles(
-            spawn_pos=(0,0), radio=15, color=(255,255,255), velocity=0, direccion=(1,0), radio_down=.5,
-            time_between_spawns=.01, max_distance=1000, spawn_count=1, max_particles=100
-        )
+            spawn_pos=(0,0), radio=15, color=(255,255,255), velocity=0, angle=0, radio_down=.5,
+            vel_dispersion=.5, angle_dispersion=30, radio_dispersion=10, max_particles=100, time_between_spawns=.01,
+            max_distance=1000, spawn_count=1
+            )
         self.last_ball_pos = (0,0)
         self.background = Background(self.ventana,(800,700),2)
         self.background2 = Background(self.ventana,(800,700),3)
@@ -187,7 +185,7 @@ class BrickBricker(Botons_functions):
         self.boton_game_over = Button('Restart', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
         self.text_win = Text('You Win', 50, self.fuente_orbi_extrabold, self.ventana_rect.center,  with_rect=True, border_radius=20)
         self.boton_win = Button('Next lvl', 30, self.fuente_orbi_medium, (self.ventana_rect.centerx, self.ventana_rect.height * 0.8),  (40,10), 'center', 'white', color_rect='black', color_rect_active=(20,20,20), border_radius=5, border_top_right_radius=20, border_bottom_left_radius=20, border_width=8, border_color='purple')
-        self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)), self.ventana, 20)
+        self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)), self.ventana, 50)
 
         self.text_ganaste=Text('Haz Ganado el juego\nGracias por jugar',40,self.fuente_orbi_medium,(self.ventana_rect.centerx,self.ventana_rect.centery-50),'center','white')
 
@@ -199,7 +197,7 @@ class BrickBricker(Botons_functions):
         self.boton_fan_lvls = Button('', 30, self.fuente_simbolos, (self.boton_jugar.rect.right + 20,self.boton_jugar.rect.centery),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_fan_lvls_title)
         self.options_text_title = Button('Opciones', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.15),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_opciones)
         self.salir_text_title = Button('Cerrar', 35, self.fuente_orbi_medium, (self.ventana_rect.centerx,self.ventana_rect.centery * 1.3),  0, 'center', 'white', color_active='darkgrey', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1)
-        self.salir_text_title.smothmove(60, 1, 0.73, 2)
+        self.salir_text_title.smothmove(1, 0.73, 2)
         self.boton_extras = Button('', 40, self.fuente_simbolos, (0,self.ventana_rect.h-20),  dire='left', color='white', with_rect=False, border_width=-1, sound_to_click=self.sounds.boton1,func=self.func_extras)
         
 
@@ -245,10 +243,10 @@ class BrickBricker(Botons_functions):
         self.boton_reload_web_lvls = Button('', 20,self.fuente_simbolos, (-100,50), dire='topleft', func= lambda:self.funcs_pool.start('cargar niveles'))
         l = [self.lista_web_lvls,self.lista_fans_lvls,self.boton_borrar,self.boton_seleccionar,self.boton_seleccionar_web,self.boton_borrar_web,self.boton_web_lvls,self.boton_custom_lvls, self.boton_reload_web_lvls]
         for x in l:
-            x.smothmove(60, 1, .9, 1) 
+            x.smothmove(1, .9, 1) 
 
         self.text_buscando_niveles: Text = Text('Buscando niveles',30,self.fuente_orbi_medium, Vector2(*self.ventana_rect.center) - (0,self.ventana_rect.height))
-        self.text_buscando_niveles.smothmove(60, 2, .7, 1)
+        self.text_buscando_niveles.smothmove(2, .7, 1)
 
 
                                                 # Del menu de extras
@@ -674,7 +672,6 @@ class BrickBricker(Botons_functions):
         if not self.low_detail_mode: self.background.draw()
         else: self.ventana.fill('black')
         
-        self.GUI_admin.input_update(e)
         for event in e:
             if event.type == QUIT:
                 pag.quit()
@@ -781,8 +778,8 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.draw()
 
             for x in [*self.texts_title_list,*self.botones_title_list]:
-                x.update()
-                x.draw(self.ventana)
+                x.update(mouse_pos = pag.mouse.get_pos())
+                x.draw(self.ventana, always_draw=True)
             # for x in self.texts_title_list:
             #     x.draw(self.ventana)
             # for x in self.botones_title_list:
@@ -867,8 +864,8 @@ class BrickBricker(Botons_functions):
                 self.Serpiente.draw()
 
             for x in [*self.texts_options_list,*self.botones_options_list]:
-                x.update()
-                x.draw(self.ventana)
+                x.update(mouse_pos = pag.mouse.get_pos())
+                x.draw(self.ventana, always_draw=True)
             # for x in self.texts_options_list:
             #     x.draw(self.ventana)
             # for x in self.botones_options_list:
@@ -876,7 +873,8 @@ class BrickBricker(Botons_functions):
 
             pag.draw.circle(self.ventana, 'white', self.button_toggle_fullscreen.rect.center, 27, 4)
                 
-            self.GUI_admin.draw(self.ventana, (mx,my))
+            self.GUI_admin.update(mouse_pos = pag.mouse.get_pos())
+            self.GUI_admin.draw(self.ventana)
 
             pag.display.flip()
             self.relog.tick(60)
@@ -945,7 +943,7 @@ class BrickBricker(Botons_functions):
 
             for x in [*self.texts_pause_list,*self.botones_pause_list]:
                 x.update()
-                x.draw(self.ventana)
+                x.draw(self.ventana, always_draw=True)
             # [x.draw(self.ventana) for x in self.texts_pause_list]
             # [x.draw(self.ventana) for x in ]
 
@@ -1066,10 +1064,11 @@ class BrickBricker(Botons_functions):
                     self.sounds.lvl_clear.play()
                 self.text_win.draw(self.ventana)
                 self.boton_win.draw(self.ventana)
-                if self.efecto_win.update():
+                # if self.efecto_win.update():
+                self.efecto_win.update()
                     # self.efecto_win = Effect(3,(random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50)),self.ventana, 20)
-                    self.efecto_win.fr['coords'] = (random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50))
-                    self.efecto_win.reset()
+                    # self.efecto_win.fr['coords'] = (random.randint(50,self.ventana_rect.w-50),random.randint(50,self.ventana_rect.h-50))
+                    # self.efecto_win.reset()
                 
                 self.efecto_win.draw()
             elif self.alive:

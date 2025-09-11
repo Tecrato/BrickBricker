@@ -12,7 +12,7 @@ class Snake:
 
         # self.particles = Particles(self.surface, radius=10)
         self.particles = Particles(
-            spawn_pos=(0,0), radio=20, color=(255,255,255), velocity=.1, direccion=(1,0), radio_down=.05,
+            spawn_pos=(0,0), radio=20, color=(255,255,255), velocity=.1, angle=0, radio_down=.05,
             vel_dispersion=.5, angle_dispersion=30, radio_dispersion=10, max_particles=100, time_between_spawns=.01,
             max_distance=1000, spawn_count=1
             )
@@ -33,7 +33,10 @@ class Snake:
 
         self.particles.spawn_pos = self.cuerpo1.center
         self.particles.velocity = Hipotenuza((0,0),Vector2(self.cuerpo1.center) - Vector2(self.Cabeza.center))/10
-        self.particles.direccion = Vector2(Vector2(self.cuerpo1.center) - Vector2(self.Cabeza.center)).normalize()
+        try:
+            self.particles.direccion = Vector2(Vector2(self.cuerpo1.center) - Vector2(self.Cabeza.center)).normalize()
+        except ValueError:
+            self.particles.direccion = Vector2(0,0)
         self.particles.update(dt=1)
 
     def reset(self) -> None:
